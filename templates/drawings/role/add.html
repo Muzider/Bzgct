@@ -1,0 +1,49 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}新增角色 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">新增角色</h1>
+    <div class="breadcrumb">权限管理 > 角色管理 > 新增角色</div>
+</div>
+
+<div class="content-card">
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="name" class="form-label">角色名称 *</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description" class="form-label">角色描述</label>
+            <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">状态</label>
+            <div>
+                <label for="is_active_1" style="margin-right: 20px;">
+                    <input type="radio" id="is_active_1" name="is_active" value="1" checked> 启用
+                </label>
+                <label for="is_active_0">
+                    <input type="radio" id="is_active_0" name="is_active" value="0"> 禁用
+                </label>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'drawings:role_list' %}" class="btn btn-secondary">返回列表</a>
+            <button type="submit" class="btn btn-success">保存角色</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}新增作业工种 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">新增作业工种</h1>
+    <div class="breadcrumb">基础设置 / 作业工种管理 / 新增</div>
+</div>
+
+<div class="content-card">
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="work_type_name" class="form-label">工种名称 *</label>
+            <input type="text" id="work_type_name" name="work_type_name" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="work_type_code" class="form-label">工种编码 *</label>
+            <input type="text" id="work_type_code" name="work_type_code" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="standard_hours" class="form-label">标准作业工时（小时） *</label>
+            <input type="number" id="standard_hours" name="standard_hours" class="form-control" step="0.01" min="0" required>
+        </div>
+
+
+
+        <div class="form-group">
+            <label for="description" class="form-label">工种描述</label>
+            <textarea id="description" name="description" class="form-control" rows="4" placeholder="请输入工种描述..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">状态</label>
+            <div>
+                <label for="is_active_1" style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="radio" id="is_active_1" name="is_active" value="1" checked style="margin-right: 8px;">
+                    <span>启用</span>
+                </label>
+                <label for="is_active_0" style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="radio" id="is_active_0" name="is_active" value="0" style="margin-right: 8px;">
+                    <span>禁用</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">保存</button>
+            <a href="{% url 'drawings:work_type_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

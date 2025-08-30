@@ -1,0 +1,74 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}新增作业工序 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">新增作业工序</h1>
+    <div class="breadcrumb">基础设置 / 作业工序管理 / 新增</div>
+</div>
+
+<div class="content-card">
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="process_name" class="form-label">工序名称 *</label>
+            <input type="text" id="process_name" name="process_name" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="process_code" class="form-label">工序编码 *</label>
+            <input type="text" id="process_code" name="process_code" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="work_type" class="form-label">关联工种 *</label>
+            <select id="work_type" name="work_type" class="form-control" required>
+                <option value="">请选择工种</option>
+                {% for work_type in work_types %}
+                <option value="{{ work_type.id }}">
+                    {{ work_type.work_type_name }} ({{ work_type.work_type_code }}) - 标准工时: {{ work_type.standard_hours }}小时
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="coefficient" class="form-label">工时系数 *</label>
+            <input type="number" id="coefficient" name="coefficient" class="form-control" step="0.01" min="0" value="1.00" required>
+            <small class="form-text text-muted">工时系数用于调整作业工时，计算公式：作业工时 = 标准工时 × 工时系数</small>
+        </div>
+
+        <div class="form-group">
+            <label for="description" class="form-label">工序描述</label>
+            <textarea id="description" name="description" class="form-control" rows="4" placeholder="请输入工序描述..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">状态</label>
+            <div>
+                <label for="is_active_1" style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="radio" id="is_active_1" name="is_active" value="1" checked style="margin-right: 8px;">
+                    <span>启用</span>
+                </label>
+                <label for="is_active_0" style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="radio" id="is_active_0" name="is_active" value="0" style="margin-right: 8px;">
+                    <span>禁用</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">保存</button>
+            <a href="{% url 'drawings:work_process_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

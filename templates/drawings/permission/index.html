@@ -1,0 +1,50 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}权限管理 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">权限管理</h1>
+    <div class="breadcrumb">权限管理</div>
+</div>
+
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>权限管理模块</h2>
+    </div>
+    
+    <div class="menu-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="menu-item" style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: center; transition: all 0.3s ease;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">角色管理</h3>
+            <p style="color: #666; margin-bottom: 20px;">管理系统角色，设置角色权限</p>
+            <a href="{% url 'drawings:role_list' %}" class="btn btn-primary">进入角色管理</a>
+        </div>
+        
+        <div class="menu-item" style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: center; transition: all 0.3s ease;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">人员管理</h3>
+            <p style="color: #666; margin-bottom: 20px;">管理系统人员，分配人员角色</p>
+            <a href="{% url 'drawings:person_list' %}" class="btn btn-primary">进入人员管理</a>
+        </div>
+        
+        <div class="menu-item" style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: center; transition: all 0.3s ease;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">权限列表</h3>
+            <p style="color: #666; margin-bottom: 20px;">查看系统所有权限配置</p>
+            <a href="{% url 'drawings:permission_list' %}" class="btn btn-primary">查看权限列表</a>
+        </div>
+    </div>
+    
+    <div class="mt-3" style="margin-top: 30px;">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">权限管理说明</h3>
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+            <p style="margin-bottom: 10px;"><strong>权限管理流程：</strong></p>
+            <ol style="margin-left: 20px; color: #666;">
+                <li>首先在角色管理中创建角色</li>
+                <li>在权限列表中查看可用的权限</li>
+                <li>为角色分配相应的权限</li>
+                <li>在人员管理中创建人员</li>
+                <li>为人员分配相应的角色</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}删除人员 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">删除人员</h1>
+    <div class="breadcrumb">权限管理 > 人员管理 > 删除人员</div>
+</div>
+
+<div class="content-card">
+    <div class="alert alert-danger">
+        <h3>确认删除人员</h3>
+        <p>您确定要删除人员 "<strong>{{ person.name }}</strong>" 吗？</p>
+        <p>此操作不可恢复，请谨慎操作！</p>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">人员信息</label>
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px;">
+            <p><strong>姓名：</strong>{{ person.name }}</p>
+            <p><strong>工号：</strong>{{ person.employee_id }}</p>
+            <p><strong>部门：</strong>{{ person.department }}</p>
+            <p><strong>职位：</strong>{{ person.position }}</p>
+            <p><strong>性别：</strong>{{ person.get_gender_display }}</p>
+            <p><strong>电话：</strong>{{ person.phone|default:"无" }}</p>
+            <p><strong>邮箱：</strong>{{ person.email|default:"无" }}</p>
+            <p><strong>状态：</strong>
+                {% if person.is_active %}
+                    <span style="color: #27ae60;">在职</span>
+                {% else %}
+                    <span style="color: #e74c3c;">离职</span>
+                {% endif %}
+            </p>
+            <p><strong>创建时间：</strong>{{ person.created_at|date:"Y-m-d H:i:s" }}</p>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'drawings:person_list' %}" class="btn btn-secondary">取消</a>
+            <button type="submit" class="btn btn-danger">确认删除</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

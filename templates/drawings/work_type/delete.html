@@ -1,0 +1,75 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}删除作业工种 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">删除作业工种</h1>
+    <div class="breadcrumb">基础设置 / 作业工种管理 / 删除</div>
+</div>
+
+<div class="content-card">
+    <div class="alert alert-warning">
+        <h4>确认删除</h4>
+        <p>您确定要删除以下作业工种吗？此操作不可撤销。</p>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">工种名称</label>
+        <p>{{ work_type.work_type_name }}</p>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">工种编码</label>
+        <p>{{ work_type.work_type_code }}</p>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">标准作业工时</label>
+        <p>{{ work_type.standard_hours }} 小时</p>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">关联工序</label>
+        <p>
+            {% for process in work_type.workprocess_set.all %}
+                <span class="badge" style="background-color: #3498db; color: white; padding: 2px 6px; margin: 1px; border-radius: 3px; font-size: 11px;">
+                    {{ process.process_name }}
+                </span>
+            {% empty %}
+                <span style="color: #999;">无关联工序</span>
+            {% endfor %}
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">工种描述</label>
+        <p>
+            {% if work_type.description %}
+                {{ work_type.description }}
+            {% else %}
+                <span style="color: #999;">无描述</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">状态</label>
+        <p>
+            {% if work_type.is_active %}
+                <span style="color: #27ae60; font-weight: bold;">启用</span>
+            {% else %}
+                <span style="color: #e74c3c; font-weight: bold;">禁用</span>
+            {% endif %}
+        </p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <button type="submit" class="btn btn-danger">确认删除</button>
+            <a href="{% url 'drawings:work_type_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

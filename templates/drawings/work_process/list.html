@@ -1,0 +1,173 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}作业工序管理 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">作业工序管理</h1>
+    <div class="breadcrumb">基础设置 / 作业工序管理</div>
+</div>
+
+<div class="content-card">
+    <!-- 搜索和操作栏 -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <form method="get" class="d-flex">
+                <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="搜索工序名称、编码或描述..." style="width: 250px; margin-right: 10px;">
+                <select name="work_type" class="form-control" style="width: 150px; margin-right: 10px;">
+                    <option value="">所有工种</option>
+                    {% for work_type in work_types %}
+                    <option value="{{ work_type.work_type_name }}" {% if work_type_filter == work_type.work_type_name %}selected{% endif %}>
+                        {{ work_type.work_type_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">搜索</button>
+                {% if search_query or work_type_filter %}
+                    <a href="{% url 'drawings:work_process_list' %}" class="btn btn-secondary" style="margin-left: 10px;">清除</a>
+                {% endif %}
+            </form>
+        </div>
+        <div>
+            <a href="{% url 'drawings:work_process_add' %}" class="btn btn-success">新增作业工序</a>
+        </div>
+    </div>
+
+    {% if page_obj %}
+    <!-- 作业工序列表 -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>工序名称</th>
+                <th>工序编码</th>
+                <th>关联工种</th>
+                <th>工时系数</th>
+                <th>作业工时</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work_process in page_obj %}
+            <tr>
+                <td>{{ work_process.process_name }}</td>
+                <td>{{ work_process.process_code }}</td>
+                <td>
+                    <span class="badge" style="background-color: #27ae60; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ work_process.work_type.work_type_name }}
+                    </span>
+                </td>
+                <td>{{ work_process.coefficient }}</td>
+                <td>{{ work_process.work_hours }} 小时</td>
+                <td>
+                    {% if work_process.description %}
+                        {{ work_process.description|truncatechars:50 }}
+                    {% else %}
+                        <span style="color: #999;">无描述</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if work_process.is_active %}
+                        <span style="color: #27ae60; font-weight: bold;">启用</span>
+                    {% else %}
+                        <span style="color: #e74c3c; font-weight: bold;">禁用</span>
+                    {% endif %}
+                </td>
+                <td>{{ work_process.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'drawings:work_process_edit' work_process.id %}" class="btn btn-warning btn-sm">编辑</a>
+                    <a href="{% url 'drawings:work_process_delete' work_process.id %}" class="btn btn-danger btn-sm">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- 分页信息 -->
+    <div class="pagination-info">
+        <p>
+            共 <strong>{{ page_obj.paginator.count }}</strong> 条记录，
+            第 <strong>{{ page_obj.number }}</strong> 页，
+            共 <strong>{{ page_obj.paginator.num_pages }}</strong> 页
+            {% if search_query %}
+                （搜索关键词："{{ search_query }}"）
+            {% endif %}
+            {% if work_type_filter %}
+                （筛选工种："{{ work_type_filter }}"）
+            {% endif %}
+        </p>
+    </div>
+    
+    <!-- 分页导航 -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="分页导航">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if work_type_filter %}&work_type={{ work_type_filter }}{% endif %}" title="首页">
+                        <span>&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if work_type_filter %}&work_type={{ work_type_filter }}{% endif %}" title="上一页">
+                        <span>&lsaquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&lsaquo;</span>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if work_type_filter %}&work_type={{ work_type_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% elif num == page_obj.number|add:'-4' or num == page_obj.number|add:'4' %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if work_type_filter %}&work_type={{ work_type_filter }}{% endif %}" title="下一页">
+                        <span>&rsaquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if work_type_filter %}&work_type={{ work_type_filter }}{% endif %}" title="末页">
+                        <span>&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&rsaquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center" style="padding: 40px;">
+        <p style="color: #666; font-size: 16px;">暂无作业工序数据</p>
+        <a href="{% url 'drawings:work_process_add' %}" class="btn btn-primary">添加第一个作业工序</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

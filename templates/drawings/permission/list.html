@@ -1,0 +1,125 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}权限管理 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">权限管理</h1>
+    <div class="breadcrumb">权限管理 > 权限管理</div>
+</div>
+
+<div class="content-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>权限列表</h2>
+        <a href="{% url 'drawings:permission_add' %}" class="btn btn-success">新增权限</a>
+    </div>
+    
+    {% if page_obj %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>权限名称</th>
+                <th>权限代码</th>
+                <th>描述</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for permission in page_obj %}
+            <tr>
+                <td>{{ permission.id }}</td>
+                <td>{{ permission.name }}</td>
+                <td>{{ permission.code }}</td>
+                <td>{{ permission.description|default:"-" }}</td>
+                <td>{{ permission.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'drawings:permission_edit' permission.id %}" class="btn btn-warning btn-sm">编辑</a>
+                    <a href="{% url 'drawings:permission_delete' permission.id %}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个权限吗？')">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- 分页信息 -->
+    <div class="pagination-info">
+        <p>
+            共 <strong>{{ page_obj.paginator.count }}</strong> 条记录，
+            第 <strong>{{ page_obj.number }}</strong> 页，
+            共 <strong>{{ page_obj.paginator.num_pages }}</strong> 页
+        </p>
+    </div>
+    
+    <!-- 分页导航 -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="分页导航">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" title="首页">
+                        <span>&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" title="上一页">
+                        <span>&lsaquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&lsaquo;</span>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% elif num == page_obj.number|add:'-4' or num == page_obj.number|add:'4' %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" title="下一页">
+                        <span>&rsaquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" title="末页">
+                        <span>&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&rsaquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center" style="padding: 40px;">
+        <p style="color: #666; font-size: 16px;">暂无权限数据</p>
+        <a href="{% url 'drawings:permission_add' %}" class="btn btn-primary">创建第一个权限</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

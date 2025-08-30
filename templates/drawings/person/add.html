@@ -1,0 +1,102 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}新增人员 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">新增人员</h1>
+    <div class="breadcrumb">权限管理 > 人员管理 > 新增人员</div>
+</div>
+
+<div class="content-card">
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="name" class="form-label">姓名 *</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="employee_id" class="form-label">工号 *</label>
+            <input type="text" id="employee_id" name="employee_id" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="department" class="form-label">部门 *</label>
+            <input type="text" id="department" name="department" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="position" class="form-label">职位 *</label>
+            <input type="text" id="position" name="position" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">性别 *</label>
+            <div>
+                <label for="gender_male" style="margin-right: 20px;">
+                    <input type="radio" id="gender_male" name="gender" value="M" checked> 男 
+                </label>
+                <label for="gender_female">
+                    <input type="radio" id="gender_female" name="gender" value="F"> 女
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="phone" class="form-label">电话</label>
+            <input type="tel" id="phone" name="phone" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label for="email" class="form-label">邮箱</label>
+            <input type="email" id="email" name="email" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">状态</label>
+            <div>
+                <label for="is_active_1" style="margin-right: 20px;">
+                    <input type="radio" id="is_active_1" name="is_active" value="1" checked> 在职
+                </label>
+                <label for="is_active_0">
+                    <input type="radio" id="is_active_0" name="is_active" value="0"> 离职
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">分配角色</label>
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #dee2e6;">
+                {% if roles %}
+                    <p style="color: #666; margin-bottom: 10px; font-size: 14px;">请选择要分配给该人员的角色（可多选）：</p>
+                    {% for role in roles %}
+                    <label for="role_{{ role.id }}" style="display: block; margin-bottom: 8px; cursor: pointer;">
+                        <input type="checkbox" id="role_{{ role.id }}" name="roles" value="{{ role.id }}" style="margin-right: 8px;">
+                        <strong>{{ role.name }}</strong>
+                        {% if role.description %}
+                            <span style="color: #666; font-size: 13px;"> - {{ role.description }}</span>
+                        {% endif %}
+                    </label>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #e74c3c; font-size: 14px;">⚠️ 暂无可用的角色，请先创建角色后再添加人员。</p>
+                    <a href="{% url 'drawings:role_add' %}" class="btn btn-primary btn-sm">创建角色</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'drawings:person_list' %}" class="btn btn-secondary">返回列表</a>
+            <button type="submit" class="btn btn-success">保存人员</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
