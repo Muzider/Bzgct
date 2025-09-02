@@ -1,23 +1,28 @@
 {% extends 'drawings/base.html' %}
 
-{% block title %}典型分段管理 - 标准工程图系统{% endblock %}
+{% block title %}项目信息管理 - 标准工程图系统{% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">典型分段管理</h1>
-    <div class="breadcrumb">典型分段管理</div>
+    <h1 class="page-title">项目信息管理</h1>
+    <div class="breadcrumb">项目管理 > 项目信息管理</div>
 </div>
 
 <div class="content-card">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>典型分段列表</h2>
-        <a href="{% url 'drawings:typical_section_add' %}" class="btn btn-success btn-action">新增分段</a>
+        <h2>项目信息列表</h2>
+        <a href="{% url 'drawings:project_add' %}" class="btn btn-success btn-action">新增项目</a>
     </div>
     
     <!-- 搜索和筛选区域 -->
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
         <form method="get" class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <label for="search" class="form-label">搜索</label>
+                <input type="text" name="search" id="search" class="form-control" 
+                       value="{{ search_query }}" placeholder="搜索项目名称或船级社">
+            </div>
+            <div class="col-md-3">
                 <label for="ship_type" class="form-label">船型筛选</label>
                 <select name="ship_type" id="ship_type" class="form-control">
                     <option value="">全部船型</option>
@@ -28,14 +33,20 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
-                <label for="search" class="form-label">搜索</label>
-                <input type="text" name="search" id="search" class="form-control" 
-                       value="{{ search_query }}" placeholder="搜索分段名称、编码、描述等">
+            <div class="col-md-3">
+                <label for="delivery_year" class="form-label">交船年份</label>
+                <select name="delivery_year" id="delivery_year" class="form-control">
+                    <option value="">全部年份</option>
+                    {% for year in delivery_years %}
+                    <option value="{{ year }}" {% if delivery_year_filter == year|stringformat:"s" %}selected{% endif %}>
+                        {{ year }}年
+                    </option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="col-md-4 d-flex align-items-end gap-2">
+            <div class="col-md-3 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary btn-search">搜索</button>
-                <a href="{% url 'drawings:typical_section_list' %}" class="btn btn-secondary btn-search">重置</a>
+                <a href="{% url 'drawings:project_list' %}" class="btn btn-secondary btn-search">重置</a>
             </div>
         </form>
     </div>
@@ -45,38 +56,38 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>船型</th>
-                <th>分段名称</th>
-                <th>分段编码</th>
-                <th>描述</th>
+                <th>项目名称</th>
+                <th>所属船型</th>
+                <th>所属船级社</th>
+                <th>交船日期</th>
                 <th>状态</th>
                 <th>创建时间</th>
                 <th>操作</th>
             </tr>
         </thead>
         <tbody>
-            {% for section in page_obj %}
+            {% for project in page_obj %}
             <tr>
-                <td>{{ section.id }}</td>
+                <td>{{ project.id }}</td>
+                <td><strong>{{ project.project_name }}</strong></td>
                 <td>
                     <span style="display: inline-block; background-color: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
-                        {{ section.ship_type.ship_type }}
+                        {{ project.ship_type.ship_type }}
                     </span>
                 </td>
-                <td><strong>{{ section.section_name }}</strong></td>
-                <td>{{ section.section_code|default:"-" }}</td>
-                <td>{{ section.description|default:"-"|truncatechars:50 }}</td>
+                <td>{{ project.classification_society }}</td>
+                <td>{{ project.delivery_date|date:"Y-m-d" }}</td>
                 <td>
-                    {% if section.is_active %}
+                    {% if project.is_active %}
                         <span style="color: #27ae60; font-weight: bold;">启用</span>
                     {% else %}
                         <span style="color: #e74c3c; font-weight: bold;">禁用</span>
                     {% endif %}
                 </td>
-                <td>{{ section.created_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ project.created_at|date:"Y-m-d H:i" }}</td>
                 <td>
-                    <a href="{% url 'drawings:typical_section_edit' section.id %}" class="btn btn-warning btn-table">编辑</a>
-                    <a href="{% url 'drawings:typical_section_delete' section.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个典型分段吗？')">删除</a>
+                    <a href="{% url 'drawings:project_edit' project.id %}" class="btn btn-warning btn-table">编辑</a>
+                    <a href="{% url 'drawings:project_delete' project.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个项目吗？')">删除</a>
                 </td>
             </tr>
             {% endfor %}
@@ -86,9 +97,12 @@
     <!-- 分页信息 -->
     <div class="pagination-info">
         <p>
-            共找到 <strong>{{ page_obj.paginator.count }}</strong> 个典型分段
+            共找到 <strong>{{ page_obj.paginator.count }}</strong> 个项目
             {% if ship_type_filter %}
                 （筛选条件：船型 = "{{ ship_type_filter }}"）
+            {% endif %}
+            {% if delivery_year_filter %}
+                （筛选条件：交船年份 = "{{ delivery_year_filter }}年"）
             {% endif %}
             {% if search_query %}
                 （搜索关键词："{{ search_query }}"）
@@ -103,12 +117,12 @@
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="首页">
+                    <a class="page-link" href="?page=1{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if delivery_year_filter %}&delivery_year={{ delivery_year_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="首页">
                         <span>&laquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="上一页">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if delivery_year_filter %}&delivery_year={{ delivery_year_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="上一页">
                         <span>&lsaquo;</span>
                     </a>
                 </li>
@@ -128,7 +142,7 @@
                     </li>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if delivery_year_filter %}&delivery_year={{ delivery_year_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a>
                     </li>
                 {% elif num == page_obj.number|add:'-4' or num == page_obj.number|add:'4' %}
                     <li class="page-item disabled">
@@ -139,12 +153,12 @@
             
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="下一页">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if delivery_year_filter %}&delivery_year={{ delivery_year_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="下一页">
                         <span>&rsaquo;</span>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="末页">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if ship_type_filter %}&ship_type={{ ship_type_filter }}{% endif %}{% if delivery_year_filter %}&delivery_year={{ delivery_year_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" title="末页">
                         <span>&raquo;</span>
                     </a>
                 </li>
@@ -163,13 +177,13 @@
     {% else %}
     <div class="text-center" style="padding: 40px;">
         <p style="color: #666; font-size: 16px;">
-            {% if ship_type_filter or search_query %}
-                没有找到符合条件的典型分段
+            {% if ship_type_filter or delivery_year_filter or search_query %}
+                没有找到符合条件的项目
             {% else %}
-                暂无典型分段数据
+                暂无项目数据
             {% endif %}
         </p>
-        <a href="{% url 'drawings:typical_section_add' %}" class="btn btn-primary">添加第一个典型分段</a>
+        <a href="{% url 'drawings:project_add' %}" class="btn btn-primary">添加第一个项目</a>
     </div>
     {% endif %}
 </div>

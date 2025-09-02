@@ -1,0 +1,145 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}新增分段 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">新增分段</h1>
+    <div class="breadcrumb">项目管理 > 分段管理 > 新增分段</div>
+</div>
+
+<div class="content-card">
+    <h2>分段信息</h2>
+    
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="section_number" class="form-label">分段号 <span style="color: red;">*</span></label>
+                    <input type="text" id="section_number" name="section_number" class="form-control" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="project" class="form-label">所属项目 <span style="color: red;">*</span></label>
+                    <select id="project" name="project" class="form-control" required>
+                        <option value="">请选择项目</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.project_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="section_type" class="form-label">分段类型 <span style="color: red;">*</span></label>
+                    <select id="section_type" name="section_type" class="form-control" required>
+                        <option value="">请选择分段类型</option>
+                        {% for section_type in typical_sections %}
+                        <option value="{{ section_type.id }}">{{ section_type.section_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="block_number" class="form-label">胎架号</label>
+                    <input type="text" id="block_number" name="block_number" class="form-control">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="planned_start_date" class="form-label">计划开始时间</label>
+                    <input type="date" id="planned_start_date" name="planned_start_date" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="on_block_date" class="form-label">上胎日期</label>
+                    <input type="date" id="on_block_date" name="on_block_date" class="form-control">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="off_block_date" class="form-label">下胎日期</label>
+                    <input type="date" id="off_block_date" name="off_block_date" class="form-control">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="end_date" class="form-label">结束时间</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label">模型接收</label>
+                    <div>
+                        <label for="model_received" style="margin-right: 20px;">
+                            <input type="checkbox" id="model_received" name="model_received"> 已接收
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label">BOM接收</label>
+                    <div>
+                        <label for="bom_received" style="margin-right: 20px;">
+                            <input type="checkbox" id="bom_received" name="bom_received"> 已接收
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label">满足开工条件</label>
+                    <div>
+                        <label for="start_conditions_met" style="margin-right: 20px;">
+                            <input type="checkbox" id="start_conditions_met" name="start_conditions_met"> 已满足
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">状态</label>
+            <div>
+                <label for="is_active_1" style="margin-right: 20px;">
+                    <input type="radio" id="is_active_1" name="is_active" value="1" checked> 启用
+                </label>
+                <label for="is_active_0">
+                    <input type="radio" id="is_active_0" name="is_active" value="0"> 禁用
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">保存</button>
+            <a href="{% url 'drawings:section_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

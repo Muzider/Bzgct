@@ -1,0 +1,209 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}分段管理 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">分段管理</h1>
+    <div class="breadcrumb">项目管理 > 分段管理</div>
+</div>
+
+<div class="content-card">
+    <!-- 搜索和筛选区域 -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <form method="get" class="row">
+            <div class="col-md-4">
+                <label for="project" class="form-label">项目名称</label>
+                <select name="project" id="project" class="form-control" multiple style="height: 100px;">
+                    {% for project in projects %}
+                    <option value="{{ project.id }}" {% if project.id|stringformat:"s" in project_filter %}selected{% endif %}>
+                        {{ project.project_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">按住Ctrl键可多选</small>
+            </div>
+            <div class="col-md-3">
+                <label for="start_date" class="form-label">开始日期</label>
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date_filter }}">
+            </div>
+            <div class="col-md-3">
+                <label for="end_date" class="form-label">结束日期</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date_filter }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary btn-search">查询</button>
+                <a href="{% url 'drawings:section_list' %}" class="btn btn-secondary btn-search">重置</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- 操作按钮区域 -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>分段列表</h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'drawings:section_import' %}" class="btn btn-outline-info btn-action">
+                <i class="fas fa-file-excel"></i>导入Excel
+            </a>
+            <a href="{% url 'drawings:section_add' %}" class="btn btn-primary btn-action">
+                <i class="fas fa-plus"></i>新增分段
+            </a>
+        </div>
+    </div>
+    
+    {% if page_obj %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>分段号</th>
+                <th>分段类型</th>
+                <th>计划开始时间</th>
+                <th>上胎日期</th>
+                <th>下胎日期</th>
+                <th>结束时间</th>
+                <th>胎架号</th>
+                <th>在胎周期</th>
+                <th>模型接收</th>
+                <th>BOM接收</th>
+                <th>满足开工条件</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for section in page_obj %}
+            <tr>
+                <td><strong>{{ section.section_number }}</strong></td>
+                <td>
+                    <span style="display: inline-block; background-color: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ section.section_type.section_name }}
+                    </span>
+                </td>
+                <td>{{ section.planned_start_date|date:"Y.m.d"|default:"-" }}</td>
+                <td>{{ section.on_block_date|date:"Y.m.d"|default:"-" }}</td>
+                <td>{{ section.off_block_date|date:"Y.m.d"|default:"-" }}</td>
+                <td>{{ section.end_date|date:"Y.m.d"|default:"-" }}</td>
+                <td>{{ section.block_number|default:"-" }}</td>
+                <td>{{ section.on_block_cycle }}天</td>
+                <td>
+                    {% if section.model_received %}
+                        <span style="color: #27ae60; font-weight: bold;">☑</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">☐</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if section.bom_received %}
+                        <span style="color: #27ae60; font-weight: bold;">☑</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">☐</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if section.start_conditions_met %}
+                        <span style="color: #27ae60; font-weight: bold;">☑</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">☐</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'drawings:section_edit' section.id %}" class="btn btn-warning btn-table">编辑</a>
+                        <a href="{% url 'drawings:section_delete' section.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个分段吗？')">删除</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- 分页信息 -->
+    <div class="pagination-info">
+        <p>
+            共找到 <strong>{{ page_obj.paginator.count }}</strong> 个分段
+            {% if project_filter %}
+                （筛选条件：项目 = {{ project_filter|length }}个）
+            {% endif %}
+            {% if start_date_filter and end_date_filter %}
+                （时间区间：{{ start_date_filter }} ~ {{ end_date_filter }}）
+            {% endif %}
+            （第 <strong>{{ page_obj.number }}</strong> 页，共 <strong>{{ page_obj.paginator.num_pages }}</strong> 页）
+        </p>
+    </div>
+    
+    <!-- 分页导航 -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="分页导航">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for project_id in project_filter %}&project={{ project_id }}{% endfor %}{% if start_date_filter %}&start_date={{ start_date_filter }}{% endif %}{% if end_date_filter %}&end_date={{ end_date_filter }}{% endif %}" title="首页">
+                        <span>&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for project_id in project_filter %}&project={{ project_id }}{% endfor %}{% if start_date_filter %}&start_date={{ start_date_filter }}{% endif %}{% if end_date_filter %}&end_date={{ end_date_filter }}{% endif %}" title="上一页">
+                        <span>&lsaquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&lsaquo;</span>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% for project_id in project_filter %}&project={{ project_id }}{% endfor %}{% if start_date_filter %}&start_date={{ start_date_filter }}{% endif %}{% if end_date_filter %}&end_date={{ end_date_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% elif num == page_obj.number|add:'-4' or num == page_obj.number|add:'4' %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for project_id in project_filter %}&project={{ project_id }}{% endfor %}{% if start_date_filter %}&start_date={{ start_date_filter }}{% endif %}{% if end_date_filter %}&end_date={{ end_date_filter }}{% endif %}" title="下一页">
+                        <span>&rsaquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for project_id in project_filter %}&project={{ project_id }}{% endfor %}{% if start_date_filter %}&start_date={{ start_date_filter }}{% endif %}{% if end_date_filter %}&end_date={{ end_date_filter }}{% endif %}" title="末页">
+                        <span>&raquo;</span>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&rsaquo;</span>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">&raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center" style="padding: 40px;">
+        <p style="color: #666; font-size: 16px;">
+            {% if project_filter or start_date_filter or end_date_filter %}
+                没有找到符合条件的分段
+            {% else %}
+                暂无分段数据
+            {% endif %}
+        </p>
+        <a href="{% url 'drawings:section_add' %}" class="btn btn-primary">添加第一个分段</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

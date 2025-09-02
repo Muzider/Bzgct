@@ -1,0 +1,390 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}标准工艺流程详情 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">标准工艺流程详情</h1>
+    <div class="breadcrumb">基础设置 > 标准工艺流程管理 > 详情</div>
+</div>
+
+<div class="content-card">
+    <!-- 基本信息 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle"></i> 基本信息
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">工艺流程名称</label>
+                        <p class="form-control-plaintext">{{ process_flow.name }}</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">船型</label>
+                        <p class="form-control-plaintext">
+                            <span style="display: inline-block; background-color: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                {{ process_flow.ship_type.ship_type }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">典型分段</label>
+                        <p class="form-control-plaintext">
+                            <span style="display: inline-block; background-color: #e8f5e8; color: #2d5a2d; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                                {{ process_flow.typical_section.section_name }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">预估总工时</label>
+                        <p class="form-control-plaintext">
+                            <span style="color: #f39c12; font-weight: bold; font-size: 16px;">
+                                {{ process_flow.estimated_total_hours|floatformat:1 }} 小时
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            {% if process_flow.description %}
+            <div class="row">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">工艺流程描述</label>
+                        <p class="form-control-plaintext">{{ process_flow.description }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">创建时间</label>
+                        <p class="form-control-plaintext">{{ process_flow.created_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">最后更新</label>
+                        <p class="form-control-plaintext">{{ process_flow.updated_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 工艺流程步骤 -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-list-ol"></i> 工艺流程步骤
+                <span class="badge bg-primary ms-2">{{ steps|length }} 个步骤</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if steps %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 50px;">序号</th>
+                            <th style="width: 200px;">步骤名称</th>
+                            <th style="width: 200px;">作业工序</th>
+                            <th style="width: 100px;">执行顺序</th>
+                            <th style="width: 120px;">并行组号</th>
+                            <th style="width: 120px;">预估工时</th>
+                            <th style="width: 200px;">步骤描述</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for step in steps %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td><strong>{{ step.step_name }}</strong></td>
+                            <td>
+                                <div>
+                                    <span style="display: inline-block; background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px;">
+                                        {{ step.work_process.process_name }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">{{ step.work_process.work_type.work_type_name }}</small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ step.step_order }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% if step.parallel_group == 0 %}
+                                    <span class="badge bg-info">顺序执行</span>
+                                {% else %}
+                                    <span class="badge bg-warning">并行组 {{ step.parallel_group }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span style="color: #e67e22; font-weight: bold;">
+                                    {{ step.estimated_hours|floatformat:1 }} 小时
+                                </span>
+                            </td>
+                            <td>
+                                {% if step.description %}
+                                    {{ step.description }}
+                                {% else %}
+                                    <span class="text-muted">无描述</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 并行执行可视化 -->
+            <div class="mt-4">
+                <h6><i class="fas fa-project-diagram"></i> 执行流程可视化</h6>
+                <div class="process-flow-visualization">
+                    {% regroup steps by parallel_group as parallel_groups %}
+                    {% for group in parallel_groups %}
+                        <div class="process-group mb-4">
+                            {% if group.grouper == 0 %}
+                                <!-- 顺序执行组 -->
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="badge bg-secondary me-2 fs-6">步骤 {{ group.list.0.step_order }}</span>
+                                    <span class="text-muted fw-bold">顺序执行</span>
+                                </div>
+                                <div class="d-flex flex-column align-items-center">
+                                    {% for step in group.list %}
+                                    <div class="process-step-sequential mb-2 p-3" style="background-color: #f8f9fa; border-left: 4px solid #6c757d; border-radius: 8px; min-width: 280px; max-width: 350px; text-align: center;">
+                                        <strong class="text-primary">{{ step.step_name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ step.work_process.process_name }}</small>
+                                        <br>
+                                        <span class="badge bg-info mt-1">{{ step.estimated_hours|floatformat:1 }}小时</span>
+                                    </div>
+                                    {% if not forloop.last %}
+                                    <div class="text-center mb-2">
+                                        <i class="fas fa-arrow-down text-secondary fs-5"></i>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <!-- 并行执行组 -->
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="badge bg-warning me-2 fs-6">并行组 {{ group.grouper }}</span>
+                                    <span class="text-muted fw-bold">并行执行</span>
+                                    <span class="ms-2 text-info">
+                                        <i class="fas fa-info-circle"></i> 这些步骤可以同时进行
+                                    </span>
+                                </div>
+                                
+                                <!-- 并行步骤容器 -->
+                                <div class="parallel-container">
+                                    <div class="parallel-line-start"></div>
+                                    <div class="parallel-steps-wrapper">
+                                        {% for step in group.list %}
+                                        <div class="process-step-parallel p-3" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border: 2px solid #f39c12; border-radius: 8px; min-width: 200px; max-width: 250px; text-align: center; position: relative; margin: 0 10px;">
+                                            <!-- 并行组标识 -->
+                                            <div class="parallel-badge">{{ group.grouper }}</div>
+                                            
+                                            <strong class="text-dark">{{ step.step_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ step.work_process.process_name }}</small>
+                                            <br>
+                                            <span class="badge bg-warning mt-1">{{ step.estimated_hours|floatformat:1 }}小时</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="parallel-line-end"></div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if not forloop.last %}
+                        <div class="text-center mb-4">
+                            <div class="flow-arrow">
+                                <i class="fas fa-arrow-down text-primary fs-4"></i>
+                                <div class="arrow-line"></div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            {% else %}
+            <div class="text-center py-4">
+                <p class="text-muted">暂无工艺流程步骤</p>
+                <a href="{% url 'drawings:standard_process_flow_edit' process_flow.id %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>添加工艺步骤
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 操作按钮 -->
+    <div class="d-flex gap-2 mt-4">
+        <a href="{% url 'drawings:standard_process_flow_edit' process_flow.id %}" class="btn btn-warning btn-action">
+            <i class="fas fa-edit"></i>编辑工艺流程
+        </a>
+        <a href="{% url 'drawings:standard_process_flow_list' %}" class="btn btn-secondary btn-action">
+            <i class="fas fa-arrow-left"></i>返回列表
+        </a>
+    </div>
+</div>
+
+<style>
+.process-flow-visualization {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    overflow-x: auto;
+}
+
+.process-group {
+    padding: 15px;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    min-width: 0;
+}
+
+.process-step-sequential {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.process-step-sequential:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.process-step-parallel {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+.process-step-parallel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.parallel-container {
+    position: relative;
+    padding: 20px 0;
+    overflow-x: auto;
+}
+
+.parallel-steps-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    min-width: max-content;
+    padding: 0 20px;
+}
+
+.parallel-line-start {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background-color: #f39c12;
+    transform: translateX(-50%);
+}
+
+.parallel-line-end {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background-color: #f39c12;
+    transform: translateX(-50%);
+}
+
+.parallel-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f39c12;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+.flow-arrow {
+    position: relative;
+    display: inline-block;
+}
+
+.arrow-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 30px;
+    background-color: #3498db;
+    transform: translateX(-50%);
+}
+
+.flow-arrow i {
+    position: relative;
+    z-index: 1;
+    background-color: white;
+    padding: 0 10px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .parallel-steps-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .process-step-parallel {
+        margin: 10px 0;
+        min-width: 250px;
+    }
+    
+    .process-flow-visualization {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .process-step-sequential,
+    .process-step-parallel {
+        min-width: 250px;
+        max-width: 100%;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}托盘管理 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">托盘管理</h1>
+    <div class="breadcrumb">项目管理 > 托盘管理</div>
+</div>
+
+<div class="content-card">
+    <!-- 搜索和筛选区域 -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+        <form method="get" action="{% url 'drawings:pallet_list' %}" class="row align-items-end" id="searchForm">
+            <div class="col-md-2">
+                <label for="search_code" class="form-label">托盘编码/名称</label>
+                <input type="text" name="search_code" id="search_code" class="form-control" value="{{ search_code_filter }}" placeholder="输入托盘编码或名称">
+            </div>
+            <div class="col-md-2">
+                <label for="project" class="form-label">项目名称</label>
+                <select name="project" id="project" class="form-control" multiple style="height: 60px;">
+                    {% for project in projects %}
+                    <option value="{{ project.id }}" {% if project.id|stringformat:"s" in project_filter %}selected{% endif %}>
+                        {{ project.project_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">按住Ctrl键可多选</small>
+            </div>
+            <div class="col-md-2">
+                <label for="section" class="form-label">分段</label>
+                <select name="section" id="section" class="form-control" multiple style="height: 60px;">
+                    {% for section in sections %}
+                    <option value="{{ section.id }}" {% if section.id|stringformat:"s" in section_filter %}selected{% endif %}>
+                        {{ section.section_number }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">按住Ctrl键可多选</small>
+            </div>
+            <div class="col-md-2">
+                <label for="required_date_range" class="form-label">需求日期</label>
+                <div class="d-flex align-items-center">
+                    <input type="date" name="required_date_start" id="required_date_start" class="form-control" value="{{ required_date_start_filter }}" placeholder="开始日期" style="font-size: 14px;">
+                    <span class="mx-2 text-muted">-</span>
+                    <input type="date" name="required_date_end" id="required_date_end" class="form-control" value="{{ required_date_end_filter }}" placeholder="结束日期" style="font-size: 14px;">
+                </div>
+            </div>
+            <div class="col-md-1">
+                <label for="is_received" class="form-label">接收状态</label>
+                <select name="is_received" id="is_received" class="form-control">
+                    <option value="">全部</option>
+                    <option value="true" {% if is_received_filter == 'true' %}selected{% endif %}>已接收</option>
+                    <option value="false" {% if is_received_filter == 'false' %}selected{% endif %}>未接收</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-search">
+                    <i class="fas fa-search"></i>查询
+                </button>
+                <a href="{% url 'drawings:pallet_list' %}" class="btn btn-secondary btn-search">
+                    <i class="fas fa-redo"></i>重置
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- 操作按钮区域 -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>托盘列表</h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'drawings:pallet_import' %}" class="btn btn-outline-info btn-action">
+                <i class="fas fa-file-excel"></i>导入Excel
+            </a>
+            <a href="{% url 'drawings:pallet_add' %}" class="btn btn-primary btn-action">
+                <i class="fas fa-plus"></i>新增托盘
+            </a>
+        </div>
+    </div>
+    
+    {% if page_obj %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>托盘编码</th>
+                <th>托盘名称</th>
+                <th>所属项目</th>
+                <th>所属分段</th>
+                <th>需求日期</th>
+                <th>托盘明细</th>
+                <th>接收状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pallet in page_obj %}
+            <tr>
+                <td><strong>{{ pallet.pallet_code }}</strong></td>
+                <td>{{ pallet.pallet_name }}</td>
+                <td>
+                    <span style="display: inline-block; background-color: #e8f5e8; color: #2d5a2d; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ pallet.project.project_name }}
+                    </span>
+                </td>
+                <td>
+                    <span style="display: inline-block; background-color: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ pallet.section.section_number }}
+                    </span>
+                </td>
+                <td>{{ pallet.required_date|date:"Y.m.d"|default:"-" }}</td>
+                <td>
+                    <span title="{{ pallet.pallet_details }}">
+                        {{ pallet.pallet_details|truncatechars:30|default:"-" }}
+                    </span>
+                </td>
+                <td>
+                    {% if pallet.is_received %}
+                        <span style="color: #27ae60; font-weight: bold;">☑ 已接收</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">☐ 未接收</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'drawings:pallet_edit' pallet.id %}" class="btn btn-warning btn-table">编辑</a>
+                        <a href="{% url 'drawings:pallet_delete' pallet.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个托盘吗？')">删除</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- 分页信息 -->
+    <div class="pagination-info">
+        <p>
+            共找到 <strong>{{ page_obj.paginator.count }}</strong> 个托盘
+            （第 <strong>{{ page_obj.number }}</strong> 页，共 <strong>{{ page_obj.paginator.num_pages }}</strong> 页）
+        </p>
+    </div>
+    
+    {% else %}
+    <div class="text-center" style="padding: 40px;">
+        <p style="color: #666; font-size: 16px;">
+            {% if project_filter or section_filter or required_date_start_filter or required_date_end_filter or is_received_filter or search_code_filter %}
+                没有找到符合条件的托盘
+            {% else %}
+                暂无托盘数据
+            {% endif %}
+        </p>
+        <a href="{% url 'drawings:pallet_add' %}" class="btn btn-primary">添加第一个托盘</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 查询按钮点击事件
+    const queryBtn = document.querySelector('button[type="submit"]');
+    if (queryBtn) {
+        queryBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 获取表单元素
+            const form = document.getElementById('searchForm');
+            const searchInput = document.getElementById('search_code');
+            const projectSelect = document.getElementById('project');
+            const sectionSelect = document.getElementById('section');
+            const requiredDateStart = document.getElementById('required_date_start');
+            const requiredDateEnd = document.getElementById('required_date_end');
+            const isReceivedSelect = document.getElementById('is_received');
+            
+            // 构建查询参数
+            const params = new URLSearchParams();
+            
+            // 添加搜索编码
+            if (searchInput && searchInput.value.trim()) {
+                params.append('search_code', searchInput.value.trim());
+            }
+            
+            // 添加项目筛选
+            if (projectSelect) {
+                for (let option of projectSelect.selectedOptions) {
+                    params.append('project', option.value);
+                }
+            }
+            
+            // 添加分段筛选
+            if (sectionSelect) {
+                for (let option of sectionSelect.selectedOptions) {
+                    params.append('section', option.value);
+                }
+            }
+            
+            // 添加日期筛选
+            if (requiredDateStart && requiredDateStart.value) {
+                params.append('required_date_start', requiredDateStart.value);
+            }
+            if (requiredDateEnd && requiredDateEnd.value) {
+                params.append('required_date_end', requiredDateEnd.value);
+            }
+            
+            // 添加接收状态筛选
+            if (isReceivedSelect && isReceivedSelect.value) {
+                params.append('is_received', isReceivedSelect.value);
+            }
+            
+            // 跳转到筛选后的页面
+            const url = '{% url "drawings:pallet_list" %}?' + params.toString();
+            window.location.href = url;
+        });
+    }
+    
+    // 重置按钮点击事件
+    const resetBtn = document.querySelector('a[href*="pallet_list"]');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '{% url "drawings:pallet_list" %}';
+        });
+    }
+});
+</script>
+{% endblock %}

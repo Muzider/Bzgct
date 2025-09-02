@@ -1,0 +1,113 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}删除分段 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">删除分段</h1>
+    <div class="breadcrumb">项目管理 > 分段管理 > 删除分段</div>
+</div>
+
+<div class="content-card">
+    <h2>确认删除</h2>
+    
+    <div class="alert alert-warning">
+        <strong>警告：</strong> 您即将删除以下分段信息，此操作不可恢复！
+    </div>
+    
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3>分段信息</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; font-weight: bold; width: 120px;">分段号：</td>
+                <td style="padding: 8px;">{{ section.section_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">所属项目：</td>
+                <td style="padding: 8px;">{{ section.project.project_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">分段类型：</td>
+                <td style="padding: 8px;">{{ section.section_type.section_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">胎架号：</td>
+                <td style="padding: 8px;">{{ section.block_number|default:"未设置" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">计划开始时间：</td>
+                <td style="padding: 8px;">{{ section.planned_start_date|date:"Y-m-d"|default:"未设置" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">上胎日期：</td>
+                <td style="padding: 8px;">{{ section.on_block_date|date:"Y-m-d"|default:"未设置" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">下胎日期：</td>
+                <td style="padding: 8px;">{{ section.off_block_date|date:"Y-m-d"|default:"未设置" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">结束时间：</td>
+                <td style="padding: 8px;">{{ section.end_date|date:"Y-m-d"|default:"未设置" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">在胎周期：</td>
+                <td style="padding: 8px;">{{ section.on_block_cycle }}天</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">模型接收：</td>
+                <td style="padding: 8px;">
+                    {% if section.model_received %}
+                        <span style="color: #27ae60; font-weight: bold;">已接收</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">未接收</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">BOM接收：</td>
+                <td style="padding: 8px;">
+                    {% if section.bom_received %}
+                        <span style="color: #27ae60; font-weight: bold;">已接收</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">未接收</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">满足开工条件：</td>
+                <td style="padding: 8px;">
+                    {% if section.start_conditions_met %}
+                        <span style="color: #27ae60; font-weight: bold;">已满足</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">未满足</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">状态：</td>
+                <td style="padding: 8px;">
+                    {% if section.is_active %}
+                        <span style="color: #27ae60; font-weight: bold;">启用</span>
+                    {% else %}
+                        <span style="color: #e74c3c; font-weight: bold;">禁用</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">创建时间：</td>
+                <td style="padding: 8px;">{{ section.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('确定要删除这个分段吗？此操作不可恢复！')">确认删除</button>
+            <a href="{% url 'drawings:section_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -53,4 +53,31 @@ urlpatterns = [
     path('work-process/add/', views.work_process_add, name='work_process_add'),
     path('work-process/<int:process_id>/edit/', views.work_process_edit, name='work_process_edit'),
     path('work-process/<int:process_id>/delete/', views.work_process_delete, name='work_process_delete'),
+    
+    # 标准工艺流程管理
+    path('standard-process-flow/', views.standard_process_flow_list, name='standard_process_flow_list'),
+    path('standard-process-flow/add/', views.standard_process_flow_add, name='standard_process_flow_add'),
+    path('standard-process-flow/<int:process_flow_id>/edit/', views.standard_process_flow_edit, name='standard_process_flow_edit'),
+    path('standard-process-flow/<int:process_flow_id>/delete/', views.standard_process_flow_delete, name='standard_process_flow_delete'),
+    path('standard-process-flow/<int:process_flow_id>/detail/', views.standard_process_flow_detail, name='standard_process_flow_detail'),
+    
+    # 项目管理
+    path('project/', views.project_list, name='project_list'),
+    path('project/add/', views.project_add, name='project_add'),
+    path('project/<int:project_id>/edit/', views.project_edit, name='project_edit'),
+    path('project/<int:project_id>/delete/', views.project_delete, name='project_delete'),
+    
+    # 分段管理
+    path('section/', views.section_list, name='section_list'),
+    path('section/add/', views.section_add, name='section_add'),
+    path('section/<int:section_id>/edit/', views.section_edit, name='section_edit'),
+    path('section/<int:section_id>/delete/', views.section_delete, name='section_delete'),
+    path('section/import/', views.section_import, name='section_import'),
+    
+    # 托盘管理
+    path('pallet/', views.pallet_list, name='pallet_list'),
+    path('pallet/add/', views.pallet_add, name='pallet_add'),
+    path('pallet/<int:pallet_id>/edit/', views.pallet_edit, name='pallet_edit'),
+    path('pallet/<int:pallet_id>/delete/', views.pallet_delete, name='pallet_delete'),
+    path('pallet/import/', views.pallet_import, name='pallet_import'),
 ]

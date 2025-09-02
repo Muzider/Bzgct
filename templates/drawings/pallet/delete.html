@@ -1,0 +1,72 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}删除托盘 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">删除托盘</h1>
+    <div class="breadcrumb">项目管理 > 托盘管理 > 删除托盘</div>
+</div>
+
+<div class="content-card">
+    <h2>确认删除</h2>
+    
+    <div class="alert alert-warning">
+        <strong>警告：</strong>您即将删除以下托盘，此操作不可恢复！
+    </div>
+    
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3>托盘信息</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; font-weight: bold; width: 120px;">托盘编码：</td>
+                <td style="padding: 8px;">{{ pallet.pallet_code }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">托盘名称：</td>
+                <td style="padding: 8px;">{{ pallet.pallet_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">所属项目：</td>
+                <td style="padding: 8px;">{{ pallet.project.project_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">所属分段：</td>
+                <td style="padding: 8px;">{{ pallet.section.section_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">需求日期：</td>
+                <td style="padding: 8px;">{{ pallet.required_date|date:"Y年m月d日"|default:"未设置" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">接收状态：</td>
+                <td style="padding: 8px;">
+                    {% if pallet.is_received %}
+                        <span style="color: #27ae60; font-weight: bold;">已接收</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">未接收</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">托盘明细：</td>
+                <td style="padding: 8px;">{{ pallet.pallet_details|default:"无" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">创建时间：</td>
+                <td style="padding: 8px;">{{ pallet.created_at|date:"Y年m月d日 H:i" }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('确定要删除这个托盘吗？此操作不可恢复！')">
+                确认删除
+            </button>
+            <a href="{% url 'drawings:pallet_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

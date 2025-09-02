@@ -22,14 +22,14 @@
                     </option>
                     {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-primary">搜索</button>
+                <button type="submit" class="btn btn-primary btn-search">搜索</button>
                 {% if search_query or work_type_filter %}
-                    <a href="{% url 'drawings:work_process_list' %}" class="btn btn-secondary" style="margin-left: 10px;">清除</a>
+                    <a href="{% url 'drawings:work_process_list' %}" class="btn btn-secondary btn-search">清除</a>
                 {% endif %}
             </form>
         </div>
         <div>
-            <a href="{% url 'drawings:work_process_add' %}" class="btn btn-success">新增作业工序</a>
+            <a href="{% url 'drawings:work_process_add' %}" class="btn btn-success btn-action">新增作业工序</a>
         </div>
     </div>
 
@@ -77,8 +77,8 @@
                 </td>
                 <td>{{ work_process.created_at|date:"Y-m-d H:i" }}</td>
                 <td>
-                    <a href="{% url 'drawings:work_process_edit' work_process.id %}" class="btn btn-warning btn-sm">编辑</a>
-                    <a href="{% url 'drawings:work_process_delete' work_process.id %}" class="btn btn-danger btn-sm">删除</a>
+                    <a href="{% url 'drawings:work_process_edit' work_process.id %}" class="btn btn-warning btn-table">编辑</a>
+                    <a href="{% url 'drawings:work_process_delete' work_process.id %}" class="btn btn-danger btn-table">删除</a>
                 </td>
             </tr>
             {% endfor %}

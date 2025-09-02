@@ -1,0 +1,66 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}新增项目 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">新增项目</h1>
+    <div class="breadcrumb">项目管理 > 项目信息管理 > 新增项目</div>
+</div>
+
+<div class="content-card">
+    <h2>项目信息</h2>
+    
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="project_name" class="form-label">项目名称 <span style="color: red;">*</span></label>
+            <input type="text" id="project_name" name="project_name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="ship_type" class="form-label">所属船型 <span style="color: red;">*</span></label>
+            <select id="ship_type" name="ship_type" class="form-control" required>
+                <option value="">请选择船型</option>
+                {% for ship_type in ship_types %}
+                <option value="{{ ship_type.id }}">{{ ship_type.ship_type }}{% if ship_type.ship_subtype %} - {{ ship_type.ship_subtype }}{% endif %}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="classification_society" class="form-label">所属船级社</label>
+            <input type="text" id="classification_society" name="classification_society" class="form-control" placeholder="如：中国船级社、挪威船级社等">
+        </div>
+        
+        <div class="form-group">
+            <label for="delivery_date" class="form-label">交船日期 <span style="color: red;">*</span></label>
+            <input type="date" id="delivery_date" name="delivery_date" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">状态</label>
+            <div>
+                <label for="is_active_1" style="margin-right: 20px;">
+                    <input type="radio" id="is_active_1" name="is_active" value="1" checked> 启用
+                </label>
+                <label for="is_active_0">
+                    <input type="radio" id="is_active_0" name="is_active" value="0"> 禁用
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">保存</button>
+            <a href="{% url 'drawings:project_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

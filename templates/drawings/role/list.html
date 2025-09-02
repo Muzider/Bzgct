@@ -11,7 +11,7 @@
 <div class="content-card">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>角色列表</h2>
-        <a href="{% url 'drawings:role_add' %}" class="btn btn-success">新增角色</a>
+        <a href="{% url 'drawings:role_add' %}" class="btn btn-success btn-action">新增角色</a>
     </div>
     
     {% if page_obj %}
@@ -41,9 +41,9 @@
                 </td>
                 <td>{{ role.created_at|date:"Y-m-d H:i" }}</td>
                 <td>
-                    <a href="{% url 'drawings:role_permissions' role.id %}" class="btn btn-primary btn-sm">权限管理</a>
-                    <a href="{% url 'drawings:role_edit' role.id %}" class="btn btn-warning btn-sm">编辑</a>
-                    <a href="{% url 'drawings:role_delete' role.id %}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个角色吗？')">删除</a>
+                    <a href="{% url 'drawings:role_permissions' role.id %}" class="btn btn-primary btn-table">权限管理</a>
+                    <a href="{% url 'drawings:role_edit' role.id %}" class="btn btn-warning btn-table">编辑</a>
+                    <a href="{% url 'drawings:role_delete' role.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个角色吗？')">删除</a>
                 </td>
             </tr>
             {% endfor %}

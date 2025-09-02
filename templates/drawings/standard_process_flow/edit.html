@@ -1,0 +1,253 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}编辑标准工艺流程 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">编辑标准工艺流程</h1>
+    <div class="breadcrumb">基础设置 > 标准工艺流程管理 > 编辑</div>
+</div>
+
+<div class="content-card">
+    <!-- 基本信息编辑 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-info-circle"></i> 基本信息
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="update_basic" value="1">
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">工艺流程名称 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ process_flow.name }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">船型</label>
+                            <input type="text" class="form-control" value="{{ process_flow.ship_type.ship_type }}" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">典型分段</label>
+                            <input type="text" class="form-control" value="{{ process_flow.typical_section.section_name }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">工艺流程描述</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ process_flow.description }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-action">
+                        <i class="fas fa-save"></i>更新基本信息
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 工艺流程步骤管理 -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-list-ol"></i> 工艺流程步骤
+                <span class="badge bg-info ms-2">预估总工时: {{ process_flow.estimated_total_hours|floatformat:1 }} 小时</span>
+            </h5>
+            <button type="button" class="btn btn-success btn-sm" onclick="addStep()">
+                <i class="fas fa-plus"></i>添加步骤
+            </button>
+        </div>
+        <div class="card-body">
+            <form method="post" id="stepsForm">
+                {% csrf_token %}
+                <input type="hidden" name="update_steps" value="1">
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="stepsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 50px;">序号</th>
+                                <th style="width: 200px;">步骤名称</th>
+                                <th style="width: 200px;">作业工序</th>
+                                <th style="width: 100px;">执行顺序</th>
+                                <th style="width: 120px;">并行组号</th>
+                                <th style="width: 120px;">预估工时</th>
+                                <th style="width: 200px;">步骤描述</th>
+                                <th style="width: 100px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stepsTableBody">
+                            {% for step in steps %}
+                            <tr data-step-id="{{ step.id }}">
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <input type="hidden" name="step_id" value="{{ step.id }}">
+                                    <input type="text" class="form-control" name="step_name" value="{{ step.step_name }}" required>
+                                </td>
+                                <td>
+                                    <select class="form-control" name="work_process_id" required>
+                                        <option value="">请选择作业工序</option>
+                                        {% for work_process in work_processes %}
+                                        <option value="{{ work_process.id }}" 
+                                                {% if work_process.id == step.work_process.id %}selected{% endif %}
+                                                data-hours="{{ work_process.work_hours|default:0 }}">
+                                            {{ work_process.process_name }} ({{ work_process.work_type.work_type_name }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" name="step_order" value="{{ step.step_order }}" 
+                                           min="1" required style="width: 80px;">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" name="parallel_group" value="{{ step.parallel_group }}" 
+                                           min="0" style="width: 80px;" title="0表示顺序执行，相同数字表示并行执行">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control" name="estimated_hours" value="{{ step.estimated_hours }}" 
+                                           min="0" step="0.5" style="width: 80px;">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" name="description" value="{{ step.description|default:'' }}">
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeStep(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>并行执行说明：</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>执行顺序：数字越小越先执行</li>
+                        <li>并行组号：0表示顺序执行，相同数字的步骤可以并行执行</li>
+                        <li>预估工时：可以手动输入，也可以从作业工序自动获取</li>
+                    </ul>
+                </div>
+                
+                <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary btn-action">
+                        <i class="fas fa-save"></i>保存工艺流程步骤
+                    </button>
+                    <a href="{% url 'drawings:standard_process_flow_list' %}" class="btn btn-secondary btn-action">
+                        <i class="fas fa-arrow-left"></i>返回列表
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let stepCounter = {{ steps|length }};
+
+function addStep() {
+    stepCounter++;
+    const tbody = document.getElementById('stepsTableBody');
+    const newRow = document.createElement('tr');
+    
+    newRow.innerHTML = `
+        <td>${stepCounter}</td>
+        <td>
+            <input type="hidden" name="step_id" value="">
+            <input type="text" class="form-control" name="step_name" required>
+        </td>
+        <td>
+            <select class="form-control" name="work_process_id" required onchange="updateEstimatedHours(this)">
+                <option value="">请选择作业工序</option>
+                {% for work_process in work_processes %}
+                <option value="{{ work_process.id }}" data-hours="{{ work_process.work_hours|default:0 }}">
+                    {{ work_process.process_name }} ({{ work_process.work_type.work_type_name }})
+                </option>
+                {% endfor %}
+            </select>
+        </td>
+        <td>
+            <input type="number" class="form-control" name="step_order" value="${stepCounter}" 
+                   min="1" required style="width: 80px;">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="parallel_group" value="0" 
+                   min="0" style="width: 80px;" title="0表示顺序执行，相同数字表示并行执行">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="estimated_hours" value="0" 
+                   min="0" step="0.5" style="width: 80px;">
+        </td>
+        <td>
+            <input type="text" class="form-control" name="description">
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeStep(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    tbody.appendChild(newRow);
+}
+
+function removeStep(button) {
+    if (confirm('确定要删除这个步骤吗？')) {
+        button.closest('tr').remove();
+        updateStepNumbers();
+    }
+}
+
+function updateStepNumbers() {
+    const rows = document.querySelectorAll('#stepsTableBody tr');
+    rows.forEach((row, index) => {
+        row.cells[0].textContent = index + 1;
+        const orderInput = row.querySelector('input[name="step_order"]');
+        if (orderInput) {
+            orderInput.value = index + 1;
+        }
+    });
+}
+
+function updateEstimatedHours(select) {
+    const row = select.closest('tr');
+    const hoursInput = row.querySelector('input[name="estimated_hours"]');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    if (selectedOption.value && selectedOption.dataset.hours) {
+        hoursInput.value = selectedOption.dataset.hours;
+    }
+}
+
+// 为现有行添加事件监听器
+document.addEventListener('DOMContentLoaded', function() {
+    const workProcessSelects = document.querySelectorAll('select[name="work_process_id"]');
+    workProcessSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            updateEstimatedHours(this);
+        });
+    });
+});
+</script>
+{% endblock %}
+

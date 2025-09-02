@@ -1,0 +1,88 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}导入Excel - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">导入Excel</h1>
+    <div class="breadcrumb">项目管理 > 托盘管理 > 导入Excel</div>
+</div>
+
+<div class="content-card">
+    <h2>托盘数据导入</h2>
+    
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+        <h3>导入说明</h3>
+        <p>请按照以下格式准备Excel文件：</p>
+        
+        <div style="overflow-x: auto;">
+            <table class="table" style="background-color: white;">
+                <thead>
+                    <tr>
+                        <th>托盘编码</th>
+                        <th>托盘名称</th>
+                        <th>所属项目</th>
+                        <th>所属分段</th>
+                        <th>需求日期</th>
+                        <th>托盘明细</th>
+                        <th>是否接收</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>TP001</td>
+                        <td>分段001托盘</td>
+                        <td>项目A</td>
+                        <td>分段001</td>
+                        <td>2024-03-15</td>
+                        <td>零部件c1、c2、b1、b2</td>
+                        <td>是</td>
+                    </tr>
+                    <tr>
+                        <td>TP002</td>
+                        <td>分段002托盘</td>
+                        <td>项目A</td>
+                        <td>分段002</td>
+                        <td>2024-03-20</td>
+                        <td>舾装件条目</td>
+                        <td>否</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <h4>注意事项：</h4>
+            <ul>
+                <li>托盘编码必须唯一，不能重复</li>
+                <li>所属项目和所属分段必须在系统中已存在</li>
+                <li>需求日期格式：YYYY-MM-DD</li>
+                <li>是否接收：填写"是"或"否"</li>
+                <li>第一行为表头，数据从第二行开始</li>
+                <li>支持的文件格式：.xlsx, .xls</li>
+            </ul>
+        </div>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="excel_file" class="form-label">选择Excel文件 <span style="color: red;">*</span></label>
+            <input type="file" id="excel_file" name="excel_file" class="form-control" accept=".xlsx,.xls" required>
+            <small class="form-text text-muted">请选择要导入的Excel文件</small>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">开始导入</button>
+            <a href="{% url 'drawings:pallet_list' %}" class="btn btn-secondary">返回列表</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

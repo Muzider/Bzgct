@@ -1,0 +1,85 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}导入Excel - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">导入Excel</h1>
+    <div class="breadcrumb">项目管理 > 分段管理 > 导入Excel</div>
+</div>
+
+<div class="content-card">
+    <h2>Excel文件导入</h2>
+    
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3>导入说明</h3>
+        <ul>
+            <li>请确保Excel文件格式正确，包含以下列：分段号、项目名称、分段类型、计划开始时间、上胎日期、下胎日期、结束时间、胎架号</li>
+            <li>日期格式应为：YYYY-MM-DD</li>
+            <li>项目名称和分段类型必须与系统中已存在的数据匹配</li>
+            <li>分段号必须唯一</li>
+            <li>支持的文件格式：.xlsx, .xls</li>
+        </ul>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="excel_file" class="form-label">选择Excel文件 <span style="color: red;">*</span></label>
+            <input type="file" id="excel_file" name="excel_file" class="form-control" accept=".xlsx,.xls" required>
+            <small class="form-text text-muted">请选择要导入的Excel文件</small>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">开始导入</button>
+            <a href="{% url 'drawings:section_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+    
+    <div style="margin-top: 30px;">
+        <h3>Excel模板示例</h3>
+        <div style="overflow-x: auto;">
+            <table class="table table-bordered" style="font-size: 12px;">
+                <thead>
+                    <tr>
+                        <th>分段号</th>
+                        <th>项目名称</th>
+                        <th>分段类型</th>
+                        <th>计划开始时间</th>
+                        <th>上胎日期</th>
+                        <th>下胎日期</th>
+                        <th>结束时间</th>
+                        <th>胎架号</th>
+                        <th>模型接收</th>
+                        <th>BOM接收</th>
+                        <th>满足开工条件</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>888</td>
+                        <td>示例项目</td>
+                        <td>双层底分段</td>
+                        <td>2025-01-15</td>
+                        <td>2025-01-16</td>
+                        <td>2025-02-01</td>
+                        <td>2025-02-04</td>
+                        <td>4A</td>
+                        <td>是</td>
+                        <td>是</td>
+                        <td>是</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

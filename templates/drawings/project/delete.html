@@ -1,0 +1,62 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}删除项目 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">删除项目</h1>
+    <div class="breadcrumb">项目管理 > 项目信息管理 > 删除项目</div>
+</div>
+
+<div class="content-card">
+    <h2>确认删除</h2>
+    
+    <div class="alert alert-warning">
+        <strong>警告：</strong> 您即将删除以下项目信息，此操作不可恢复！
+    </div>
+    
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3>项目信息</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; font-weight: bold; width: 120px;">项目名称：</td>
+                <td style="padding: 8px;">{{ project.project_name }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">所属船型：</td>
+                <td style="padding: 8px;">{{ project.ship_type.ship_type }}{% if project.ship_type.ship_subtype %} - {{ project.ship_type.ship_subtype }}{% endif %}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">所属船级社：</td>
+                <td style="padding: 8px;">{{ project.classification_society|default:"未设置" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">交船日期：</td>
+                <td style="padding: 8px;">{{ project.delivery_date|date:"Y-m-d" }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">状态：</td>
+                <td style="padding: 8px;">
+                    {% if project.is_active %}
+                        <span style="color: #27ae60; font-weight: bold;">启用</span>
+                    {% else %}
+                        <span style="color: #e74c3c; font-weight: bold;">禁用</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; font-weight: bold;">创建时间：</td>
+                <td style="padding: 8px;">{{ project.created_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('确定要删除这个项目吗？此操作不可恢复！')">确认删除</button>
+            <a href="{% url 'drawings:project_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

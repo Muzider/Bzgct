@@ -1,0 +1,107 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}新增标准工艺流程 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">新增标准工艺流程</h1>
+    <div class="breadcrumb">基础设置 > 标准工艺流程管理 > 新增</div>
+</div>
+
+<div class="content-card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="name" class="form-label">工艺流程名称 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name" required 
+                           placeholder="例如：集装箱船绑扎桥分段标准工艺流程">
+                    <div class="form-text">请输入工艺流程的名称，便于识别和管理</div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="ship_type" class="form-label">船型 <span class="text-danger">*</span></label>
+                    <select class="form-control" id="ship_type" name="ship_type" required>
+                        <option value="">请选择船型</option>
+                        {% for ship_type in ship_types %}
+                        <option value="{{ ship_type.id }}">{{ ship_type.ship_type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="typical_section" class="form-label">典型分段 <span class="text-danger">*</span></label>
+                    <select class="form-control" id="typical_section" name="typical_section" required>
+                        <option value="">请选择典型分段</option>
+                        {% for section in typical_sections %}
+                        <option value="{{ section.id }}" data-ship-type="{{ section.ship_type.id }}">
+                            {{ section.section_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="description" class="form-label">工艺流程描述</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" 
+                              placeholder="请输入工艺流程的详细描述，包括适用范围、注意事项等"></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>提示：</strong>创建工艺流程后，您可以在编辑页面中添加具体的工艺步骤，包括作业工序、执行顺序和并行设置等。
+        </div>
+        
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-action">
+                <i class="fas fa-save"></i>创建工艺流程
+            </button>
+            <a href="{% url 'drawings:standard_process_flow_list' %}" class="btn btn-secondary btn-action">
+                <i class="fas fa-arrow-left"></i>返回列表
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const shipTypeSelect = document.getElementById('ship_type');
+    const typicalSectionSelect = document.getElementById('typical_section');
+    
+    // 当船型改变时，过滤典型分段选项
+    shipTypeSelect.addEventListener('change', function() {
+        const selectedShipTypeId = this.value;
+        const options = typicalSectionSelect.querySelectorAll('option');
+        
+        options.forEach(option => {
+            if (option.value === '') {
+                option.style.display = 'block'; // 显示"请选择"选项
+            } else {
+                const shipTypeId = option.getAttribute('data-ship-type');
+                if (selectedShipTypeId && shipTypeId !== selectedShipTypeId) {
+                    option.style.display = 'none';
+                    if (option.selected) {
+                        option.selected = false;
+                    }
+                } else {
+                    option.style.display = 'block';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+

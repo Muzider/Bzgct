@@ -11,7 +11,7 @@
 <div class="content-card">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>权限列表</h2>
-        <a href="{% url 'drawings:permission_add' %}" class="btn btn-success">新增权限</a>
+        <a href="{% url 'drawings:permission_add' %}" class="btn btn-success btn-action">新增权限</a>
     </div>
     
     {% if page_obj %}
@@ -35,8 +35,8 @@
                 <td>{{ permission.description|default:"-" }}</td>
                 <td>{{ permission.created_at|date:"Y-m-d H:i" }}</td>
                 <td>
-                    <a href="{% url 'drawings:permission_edit' permission.id %}" class="btn btn-warning btn-sm">编辑</a>
-                    <a href="{% url 'drawings:permission_delete' permission.id %}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个权限吗？')">删除</a>
+                    <a href="{% url 'drawings:permission_edit' permission.id %}" class="btn btn-warning btn-table">编辑</a>
+                    <a href="{% url 'drawings:permission_delete' permission.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个权限吗？')">删除</a>
                 </td>
             </tr>
             {% endfor %}

@@ -18,9 +18,9 @@
             </a>
             <p style="color: #666; margin-top: 10px; font-size: 14px;">角色管理、人员管理、权限分配</p>
             <div style="margin-top: 15px;">
-                <a href="{% url 'drawings:person_list' %}" class="btn btn-primary btn-sm" style="margin: 5px;">人员管理</a>
-                <a href="{% url 'drawings:role_list' %}" class="btn btn-primary btn-sm" style="margin: 5px;">角色管理</a>
-                <a href="{% url 'drawings:permission_list' %}" class="btn btn-primary btn-sm" style="margin: 5px;">权限管理</a>
+                <a href="{% url 'drawings:person_list' %}" class="btn btn-primary btn-standard" style="margin: 5px;">人员管理</a>
+                <a href="{% url 'drawings:role_list' %}" class="btn btn-primary btn-standard" style="margin: 5px;">角色管理</a>
+                <a href="{% url 'drawings:permission_list' %}" class="btn btn-primary btn-standard" style="margin: 5px;">权限管理</a>
             </div>
         </div>
         
@@ -30,12 +30,27 @@
                 基础设置
                 <span style="margin-left: 8px; font-size: 12px; color: #666;">▼</span>
             </a>
-            <p style="color: #666; margin-top: 10px; font-size: 14px;">船型管理、典型分段管理等基础数据</p>
+            <p style="color: #666; margin-top: 10px; font-size: 14px;">船型管理、典型分段管理、作业工种工序、标准工艺流程等基础数据</p>
             <div style="margin-top: 15px;">
-                <a href="{% url 'drawings:ship_type_list' %}" class="btn btn-success btn-sm" style="margin: 5px;">船型管理</a>
-                <a href="{% url 'drawings:typical_section_list' %}" class="btn btn-success btn-sm" style="margin: 5px;">典型分段</a>
-                <a href="{% url 'drawings:work_type_list' %}" class="btn btn-success btn-sm" style="margin: 5px;">作业工种</a>
-                <a href="{% url 'drawings:work_process_list' %}" class="btn btn-success btn-sm" style="margin: 5px;">作业工序</a>
+                <a href="{% url 'drawings:ship_type_list' %}" class="btn btn-success btn-standard" style="margin: 5px;">船型管理</a>
+                <a href="{% url 'drawings:typical_section_list' %}" class="btn btn-success btn-standard" style="margin: 5px;">典型分段</a>
+                <a href="{% url 'drawings:work_type_list' %}" class="btn btn-success btn-standard" style="margin: 5px;">作业工种</a>
+                <a href="{% url 'drawings:work_process_list' %}" class="btn btn-success btn-standard" style="margin: 5px;">作业工序</a>
+                <a href="{% url 'drawings:standard_process_flow_list' %}" class="btn btn-success btn-standard" style="margin: 5px;">标准工艺流程</a>
+            </div>
+        </div>
+        
+        <!-- 项目管理模块 -->
+        <div class="menu-item" style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; text-align: center; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(0,0,0,0.1)'">
+            <a href="#" style="text-decoration: none; color: #333; font-size: 18px; font-weight: bold; display: flex; align-items: center; justify-content: center;">
+                项目管理
+                <span style="margin-left: 8px; font-size: 12px; color: #666;">▼</span>
+            </a>
+            <p style="color: #666; margin-top: 10px; font-size: 14px;">项目信息、分段管理、托盘管理等</p>
+            <div style="margin-top: 15px;">
+                <a href="{% url 'drawings:project_list' %}" class="btn btn-info btn-standard" style="margin: 5px;">项目信息</a>
+                <a href="{% url 'drawings:section_list' %}" class="btn btn-info btn-standard" style="margin: 5px;">分段管理</a>
+                <a href="{% url 'drawings:pallet_list' %}" class="btn btn-info btn-standard" style="margin: 5px;">托盘管理</a>
             </div>
         </div>
     </div>

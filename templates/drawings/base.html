@@ -215,6 +215,76 @@
             font-size: 12px;
         }
         
+        /* 统一按钮样式 */
+        .btn-standard {
+            min-width: 80px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 500;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-standard:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-action {
+            min-width: 100px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-search {
+            min-width: 80px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 500;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-search:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .btn-table {
+            min-width: 70px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .btn-table:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -313,6 +383,113 @@
         
         .align-items-center {
             align-items: center;
+        }
+        
+        /* Bootstrap栅格系统 */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+        
+        .col-md-2, .col-md-3, .col-md-4, .col-md-6 {
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        
+        .col-md-2 {
+            flex: 0 0 16.666667%;
+            max-width: 16.666667%;
+        }
+        
+        .col-md-3 {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+        
+        .col-md-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+        
+        @media (max-width: 768px) {
+            .col-md-2, .col-md-3, .col-md-4, .col-md-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+        
+        /* 按钮间距 */
+        .gap-1 {
+            gap: 0.25rem;
+        }
+        
+        .gap-2 {
+            gap: 0.5rem;
+        }
+        
+        /* 按钮样式优化 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn-outline-info {
+            color: #17a2b8;
+            border-color: #17a2b8;
+            background-color: transparent;
+        }
+        
+        .btn-outline-info:hover {
+            color: white;
+            background-color: #17a2b8;
+        }
+        
+        .btn-primary {
+            color: white;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        /* 图标样式 */
+        .fas {
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+        }
+        
+        /* 如果没有Font Awesome，使用Unicode字符 */
+        .fas.fa-file-excel::before {
+            content: "📊";
+        }
+        
+        .fas.fa-plus::before {
+            content: "➕";
         }
         
         /* 分页样式 */
@@ -448,6 +625,20 @@
                         <a href="{% url 'drawings:typical_section_list' %}" class="dropdown-item">典型分段管理</a>
                         <a href="{% url 'drawings:work_type_list' %}" class="dropdown-item">作业工种管理</a>
                         <a href="{% url 'drawings:work_process_list' %}" class="dropdown-item">作业工序管理</a>
+                        <a href="{% url 'drawings:standard_process_flow_list' %}" class="dropdown-item">标准工艺流程管理</a>
+                    </div>
+                </div>
+                
+                <div class="nav-item">
+                    <a href="#" class="nav-link">
+                        项目管理
+                        <span class="dropdown-arrow">▼</span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-header">项目管理</div>
+                        <a href="{% url 'drawings:project_list' %}" class="dropdown-item">项目信息管理</a>
+                        <a href="{% url 'drawings:section_list' %}" class="dropdown-item">分段管理</a>
+                        <a href="{% url 'drawings:pallet_list' %}" class="dropdown-item">托盘管理</a>
                     </div>
                 </div>
             </nav>

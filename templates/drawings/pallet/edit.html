@@ -1,0 +1,109 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}编辑托盘 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">编辑托盘</h1>
+    <div class="breadcrumb">项目管理 > 托盘管理 > 编辑托盘</div>
+</div>
+
+<div class="content-card">
+    <h2>托盘信息</h2>
+    
+    {% if error_message %}
+    <div class="alert alert-danger">
+        {{ error_message }}
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="pallet_code" class="form-label">托盘编码 <span style="color: red;">*</span></label>
+                    <input type="text" id="pallet_code" name="pallet_code" class="form-control" value="{{ pallet.pallet_code }}" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="pallet_name" class="form-label">托盘名称 <span style="color: red;">*</span></label>
+                    <input type="text" id="pallet_name" name="pallet_name" class="form-control" value="{{ pallet.pallet_name }}" required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="project" class="form-label">所属项目 <span style="color: red;">*</span></label>
+                    <select id="project" name="project" class="form-control" required>
+                        <option value="">请选择项目</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}" {% if project.id == pallet.project.id %}selected{% endif %}>
+                            {{ project.project_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="section" class="form-label">所属分段 <span style="color: red;">*</span></label>
+                    <select id="section" name="section" class="form-control" required>
+                        <option value="">请选择分段</option>
+                        {% for section in sections %}
+                        <option value="{{ section.id }}" {% if section.id == pallet.section.id %}selected{% endif %}>
+                            {{ section.section_number }} - {{ section.project.project_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="required_date" class="form-label">需求日期</label>
+                    <input type="date" id="required_date" name="required_date" class="form-control" value="{% if pallet.required_date %}{{ pallet.required_date|date:'Y-m-d' }}{% endif %}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">接收状态</label>
+                    <div>
+                        <label for="is_received" style="margin-right: 20px;">
+                            <input type="checkbox" id="is_received" name="is_received" {% if pallet.is_received %}checked{% endif %}> 已接收
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="pallet_details" class="form-label">托盘明细</label>
+            <textarea id="pallet_details" name="pallet_details" class="form-control" rows="4" placeholder="例如：零部件c1、c2、b1、b2等，或舾装件条目">{{ pallet.pallet_details }}</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label">状态</label>
+            <div>
+                <label for="is_active_1" style="margin-right: 20px;">
+                    <input type="radio" id="is_active_1" name="is_active" value="1" {% if pallet.is_active %}checked{% endif %}> 启用
+                </label>
+                <label for="is_active_0">
+                    <input type="radio" id="is_active_0" name="is_active" value="0" {% if not pallet.is_active %}checked{% endif %}> 禁用
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">保存</button>
+            <a href="{% url 'drawings:pallet_list' %}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

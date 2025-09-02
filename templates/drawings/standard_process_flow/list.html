@@ -1,0 +1,135 @@
+{% extends 'drawings/base.html' %}
+
+{% block title %}标准工艺流程管理 - 标准工程图系统{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">标准工艺流程管理</h1>
+    <div class="breadcrumb">基础设置 > 标准工艺流程管理</div>
+</div>
+
+<div class="content-card">
+    <!-- 搜索和筛选区域 -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+        <form method="get" class="row align-items-end">
+            <div class="col-md-3">
+                <label for="search" class="form-label">搜索</label>
+                <input type="text" name="search" id="search" class="form-control" 
+                       value="{{ search_query }}" placeholder="搜索工艺流程名称、船型或分段">
+            </div>
+            <div class="col-md-3">
+                <label for="ship_type" class="form-label">船型筛选</label>
+                <select name="ship_type" id="ship_type" class="form-control" multiple style="height: 60px;">
+                    {% for ship_type in ship_types %}
+                    <option value="{{ ship_type.id }}" {% if ship_type.id|stringformat:"s" in ship_type_filter %}selected{% endif %}>
+                        {{ ship_type.ship_type }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">按住Ctrl键可多选</small>
+            </div>
+            <div class="col-md-3">
+                <label for="typical_section" class="form-label">典型分段筛选</label>
+                <select name="typical_section" id="typical_section" class="form-control" multiple style="height: 60px;">
+                    {% for section in typical_sections %}
+                    <option value="{{ section.id }}" {% if section.id|stringformat:"s" in typical_section_filter %}selected{% endif %}>
+                        {{ section.section_name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">按住Ctrl键可多选</small>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary btn-search">
+                    <i class="fas fa-search"></i>搜索
+                </button>
+                <a href="{% url 'drawings:standard_process_flow_list' %}" class="btn btn-secondary btn-search">
+                    <i class="fas fa-redo"></i>重置
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- 操作按钮区域 -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>标准工艺流程列表</h2>
+        <a href="{% url 'drawings:standard_process_flow_add' %}" class="btn btn-success btn-action">
+            <i class="fas fa-plus"></i>新增工艺流程
+        </a>
+    </div>
+    
+    {% if page_obj %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>工艺流程名称</th>
+                <th>船型</th>
+                <th>典型分段</th>
+                <th>预估总工时</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for process_flow in page_obj %}
+            <tr>
+                <td><strong>{{ process_flow.name }}</strong></td>
+                <td>
+                    <span style="display: inline-block; background-color: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ process_flow.ship_type.ship_type }}
+                    </span>
+                </td>
+                <td>
+                    <span style="display: inline-block; background-color: #e8f5e8; color: #2d5a2d; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ process_flow.typical_section.section_name }}
+                    </span>
+                </td>
+                <td>
+                    <span style="color: #f39c12; font-weight: bold;">
+                        {{ process_flow.estimated_total_hours|floatformat:1 }} 小时
+                    </span>
+                </td>
+                <td>{{ process_flow.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <div class="d-flex gap-1">
+                        <a href="{% url 'drawings:standard_process_flow_detail' process_flow.id %}" class="btn btn-info btn-table">查看</a>
+                        <a href="{% url 'drawings:standard_process_flow_edit' process_flow.id %}" class="btn btn-warning btn-table">编辑</a>
+                        <a href="{% url 'drawings:standard_process_flow_delete' process_flow.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个标准工艺流程吗？')">删除</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- 分页信息 -->
+    <div class="pagination-info">
+        <p>
+            共找到 <strong>{{ page_obj.paginator.count }}</strong> 个标准工艺流程
+            {% if ship_type_filter %}
+                （筛选条件：船型 = {{ ship_type_filter|length }}个）
+            {% endif %}
+            {% if typical_section_filter %}
+                （筛选条件：典型分段 = {{ typical_section_filter|length }}个）
+            {% endif %}
+            {% if search_query %}
+                （搜索关键词："{{ search_query }}"）
+            {% endif %}
+            （第 <strong>{{ page_obj.number }}</strong> 页，共 <strong>{{ page_obj.paginator.num_pages }}</strong> 页）
+        </p>
+    </div>
+    
+    {% else %}
+    <div class="text-center" style="padding: 40px;">
+        <p style="color: #666; font-size: 16px;">
+            {% if ship_type_filter or typical_section_filter or search_query %}
+                没有找到符合条件的标准工艺流程
+            {% else %}
+                暂无标准工艺流程数据
+            {% endif %}
+        </p>
+        <a href="{% url 'drawings:standard_process_flow_add' %}" class="btn btn-primary">添加第一个标准工艺流程</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

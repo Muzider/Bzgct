@@ -14,14 +14,14 @@
         <div>
             <form method="get" class="d-flex">
                 <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="搜索工种名称、编码或描述..." style="width: 300px; margin-right: 10px;">
-                <button type="submit" class="btn btn-primary">搜索</button>
+                <button type="submit" class="btn btn-primary btn-search">搜索</button>
                 {% if search_query %}
-                    <a href="{% url 'drawings:work_type_list' %}" class="btn btn-secondary" style="margin-left: 10px;">清除</a>
+                    <a href="{% url 'drawings:work_type_list' %}" class="btn btn-secondary btn-search">清除</a>
                 {% endif %}
             </form>
         </div>
         <div>
-            <a href="{% url 'drawings:work_type_add' %}" class="btn btn-success">新增作业工种</a>
+            <a href="{% url 'drawings:work_type_add' %}" class="btn btn-success btn-action">新增作业工种</a>
         </div>
     </div>
 
@@ -71,8 +71,8 @@
                 </td>
                 <td>{{ work_type.created_at|date:"Y-m-d H:i" }}</td>
                 <td>
-                    <a href="{% url 'drawings:work_type_edit' work_type.id %}" class="btn btn-warning btn-sm">编辑</a>
-                    <a href="{% url 'drawings:work_type_delete' work_type.id %}" class="btn btn-danger btn-sm">删除</a>
+                    <a href="{% url 'drawings:work_type_edit' work_type.id %}" class="btn btn-warning btn-table">编辑</a>
+                    <a href="{% url 'drawings:work_type_delete' work_type.id %}" class="btn btn-danger btn-table">删除</a>
                 </td>
             </tr>
             {% endfor %}
