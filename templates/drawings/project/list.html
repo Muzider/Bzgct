@@ -16,7 +16,7 @@
     
     <!-- 搜索和筛选区域 -->
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-        <form method="get" class="row">
+        <form method="get" class="row g-3">
             <div class="col-md-3">
                 <label for="search" class="form-label">搜索</label>
                 <input type="text" name="search" id="search" class="form-control" 
@@ -44,7 +44,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-3 d-flex align-items-end gap-2">
+            <div class="col-12 col-md-auto d-flex align-items-end gap-2 flex-wrap">
                 <button type="submit" class="btn btn-primary btn-search">搜索</button>
                 <a href="{% url 'drawings:project_list' %}" class="btn btn-secondary btn-search">重置</a>
             </div>

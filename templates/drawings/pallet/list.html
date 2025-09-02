@@ -11,39 +11,49 @@
 <div class="content-card">
     <!-- 搜索和筛选区域 -->
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef;">
-        <form method="get" action="{% url 'drawings:pallet_list' %}" class="row align-items-end" id="searchForm">
+        <form method="get" action="{% url 'drawings:pallet_list' %}" class="row g-3 align-items-end" id="searchForm">
             <div class="col-md-2">
                 <label for="search_code" class="form-label">托盘编码/名称</label>
                 <input type="text" name="search_code" id="search_code" class="form-control" value="{{ search_code_filter }}" placeholder="输入托盘编码或名称">
             </div>
             <div class="col-md-2">
-                <label for="project" class="form-label">项目名称</label>
-                <select name="project" id="project" class="form-control" multiple style="height: 60px;">
-                    {% for project in projects %}
-                    <option value="{{ project.id }}" {% if project.id|stringformat:"s" in project_filter %}selected{% endif %}>
-                        {{ project.project_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <small class="form-text text-muted">按住Ctrl键可多选</small>
+                <div class="form-label">项目名称</div>
+                <div class="dropdown w-100">
+                    <button id="projectDropdownBtn" class="btn btn-light w-100 text-start dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+                        <span class="text-muted">选择项目（可多选）</span>
+                    </button>
+                    <div class="dropdown-menu p-3 w-100" style="max-height: 260px; overflow: auto;">
+                        {% for project in projects %}
+                        <div class="form-check">
+                            <input class="form-check-input project-option" type="checkbox" id="project_{{ project.id }}" value="{{ project.id }}" {% if project.id|stringformat:"s" in project_filter %}checked{% endif %}>
+                            <label class="form-check-label" for="project_{{ project.id }}">{{ project.project_name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             <div class="col-md-2">
-                <label for="section" class="form-label">分段</label>
-                <select name="section" id="section" class="form-control" multiple style="height: 60px;">
-                    {% for section in sections %}
-                    <option value="{{ section.id }}" {% if section.id|stringformat:"s" in section_filter %}selected{% endif %}>
-                        {{ section.section_number }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <small class="form-text text-muted">按住Ctrl键可多选</small>
+                <div class="form-label">分段</div>
+                <div class="dropdown w-100">
+                    <button id="sectionDropdownBtn" class="btn btn-light w-100 text-start dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+                        <span class="text-muted">选择分段（可多选）</span>
+                    </button>
+                    <div class="dropdown-menu p-3 w-100" style="max-height: 260px; overflow: auto;">
+                        {% for section in sections %}
+                        <div class="form-check">
+                            <input class="form-check-input section-option" type="checkbox" id="section_{{ section.id }}" value="{{ section.id }}" {% if section.id|stringformat:"s" in section_filter %}checked{% endif %}>
+                            <label class="form-check-label" for="section_{{ section.id }}">{{ section.section_number }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             <div class="col-md-2">
-                <label for="required_date_range" class="form-label">需求日期</label>
+                <div class="form-label">需求日期</div>
                 <div class="d-flex align-items-center">
-                    <input type="date" name="required_date_start" id="required_date_start" class="form-control" value="{{ required_date_start_filter }}" placeholder="开始日期" style="font-size: 14px;">
+                    <input type="date" name="required_date_start" id="required_date_start" class="form-control" value="{{ required_date_start_filter|default_if_none:'' }}" placeholder="开始日期" style="font-size: 14px;">
                     <span class="mx-2 text-muted">-</span>
-                    <input type="date" name="required_date_end" id="required_date_end" class="form-control" value="{{ required_date_end_filter }}" placeholder="结束日期" style="font-size: 14px;">
+                    <input type="date" name="required_date_end" id="required_date_end" class="form-control" value="{{ required_date_end_filter|default_if_none:'' }}" placeholder="结束日期" style="font-size: 14px;">
                 </div>
             </div>
             <div class="col-md-1">
@@ -54,7 +64,7 @@
                     <option value="false" {% if is_received_filter == 'false' %}selected{% endif %}>未接收</option>
                 </select>
             </div>
-            <div class="col-md-2 d-flex gap-2">
+            <div class="col-12 col-md-auto d-flex gap-2 flex-wrap">
                 <button type="submit" class="btn btn-primary btn-search">
                     <i class="fas fa-search"></i>查询
                 </button>
@@ -155,6 +165,39 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    function updateSummary(buttonEl, labels) {
+        if (!buttonEl) return;
+        const text = labels.slice(0, 2).join(', ');
+        const more = labels.length > 2 ? ` +${labels.length - 2}` : '';
+        if (labels.length === 0) {
+            buttonEl.innerHTML = '<span class="text-muted">未选择</span>';
+        } else {
+            buttonEl.textContent = text + more;
+        }
+    }
+
+    function collectCheckedTexts(selector) {
+        const items = Array.from(document.querySelectorAll(selector));
+        return items.map(cb => {
+            const label = document.querySelector(`label[for="${cb.id}"]`);
+            return label ? label.textContent.trim() : cb.value;
+        });
+    }
+
+    // 初始化摘要
+    updateSummary(document.getElementById('projectDropdownBtn'), collectCheckedTexts('.project-option:checked'));
+    updateSummary(document.getElementById('sectionDropdownBtn'), collectCheckedTexts('.section-option:checked'));
+
+    // 监听复选框变更，实时更新摘要
+    document.addEventListener('change', function(e){
+        if (e.target && e.target.classList.contains('project-option')) {
+            updateSummary(document.getElementById('projectDropdownBtn'), collectCheckedTexts('.project-option:checked'));
+        }
+        if (e.target && e.target.classList.contains('section-option')) {
+            updateSummary(document.getElementById('sectionDropdownBtn'), collectCheckedTexts('.section-option:checked'));
+        }
+    });
+
     // 查询按钮点击事件
     const queryBtn = document.querySelector('button[type="submit"]');
     if (queryBtn) {
@@ -164,8 +207,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // 获取表单元素
             const form = document.getElementById('searchForm');
             const searchInput = document.getElementById('search_code');
-            const projectSelect = document.getElementById('project');
-            const sectionSelect = document.getElementById('section');
+            const projectChecks = document.querySelectorAll('.project-option:checked');
+            const sectionChecks = document.querySelectorAll('.section-option:checked');
             const requiredDateStart = document.getElementById('required_date_start');
             const requiredDateEnd = document.getElementById('required_date_end');
             const isReceivedSelect = document.getElementById('is_received');
@@ -179,17 +222,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // 添加项目筛选
-            if (projectSelect) {
-                for (let option of projectSelect.selectedOptions) {
-                    params.append('project', option.value);
-                }
+            if (projectChecks && projectChecks.length) {
+                projectChecks.forEach(cb => params.append('project', cb.value));
             }
             
             // 添加分段筛选
-            if (sectionSelect) {
-                for (let option of sectionSelect.selectedOptions) {
-                    params.append('section', option.value);
-                }
+            if (sectionChecks && sectionChecks.length) {
+                sectionChecks.forEach(cb => params.append('section', cb.value));
             }
             
             // 添加日期筛选

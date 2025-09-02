@@ -11,27 +11,32 @@
 <div class="content-card">
     <!-- 搜索和筛选区域 -->
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-        <form method="get" class="row">
+        <form method="get" class="row g-3" id="sectionSearchForm">
             <div class="col-md-4">
-                <label for="project" class="form-label">项目名称</label>
-                <select name="project" id="project" class="form-control" multiple style="height: 100px;">
-                    {% for project in projects %}
-                    <option value="{{ project.id }}" {% if project.id|stringformat:"s" in project_filter %}selected{% endif %}>
-                        {{ project.project_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <small class="form-text text-muted">按住Ctrl键可多选</small>
+                <div class="form-label">项目名称</div>
+                <div class="dropdown w-100">
+                    <button id="secProjectDropdownBtn" class="btn btn-light w-100 text-start dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+                        <span class="text-muted">选择项目（可多选）</span>
+                    </button>
+                    <div class="dropdown-menu p-3 w-100" style="max-height: 260px; overflow: auto;">
+                        {% for project in projects %}
+                        <div class="form-check">
+                            <input class="form-check-input sec-project-option" type="checkbox" id="sec_project_{{ project.id }}" value="{{ project.id }}" {% if project.id|stringformat:"s" in project_filter %}checked{% endif %}>
+                            <label class="form-check-label" for="sec_project_{{ project.id }}">{{ project.project_name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             <div class="col-md-3">
                 <label for="start_date" class="form-label">开始日期</label>
-                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date_filter }}">
+                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date_filter|default_if_none:'' }}">
             </div>
             <div class="col-md-3">
                 <label for="end_date" class="form-label">结束日期</label>
-                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date_filter }}">
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date_filter|default_if_none:'' }}">
             </div>
-            <div class="col-md-2 d-flex align-items-end gap-2">
+            <div class="col-12 col-md-auto d-flex align-items-end gap-2 flex-wrap">
                 <button type="submit" class="btn btn-primary btn-search">查询</button>
                 <a href="{% url 'drawings:section_list' %}" class="btn btn-secondary btn-search">重置</a>
             </div>
@@ -55,6 +60,7 @@
     <table class="table">
         <thead>
             <tr>
+                <th>项目名称</th>
                 <th>分段号</th>
                 <th>分段类型</th>
                 <th>计划开始时间</th>
@@ -72,6 +78,11 @@
         <tbody>
             {% for section in page_obj %}
             <tr>
+                <td>
+                    <span style="display: inline-block; background-color: #e8f5e8; color: #2d5a2d; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                        {{ section.project.project_name }}
+                    </span>
+                </td>
                 <td><strong>{{ section.section_number }}</strong></td>
                 <td>
                     <span style="display: inline-block; background-color: #e3f2fd; color: #1976d2; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
@@ -206,4 +217,52 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateSummary(buttonEl, labels) {
+        if (!buttonEl) return;
+        const text = labels.slice(0, 2).join(', ');
+        const more = labels.length > 2 ? ` +${labels.length - 2}` : '';
+        if (labels.length === 0) {
+            buttonEl.innerHTML = '<span class="text-muted">未选择</span>';
+        } else {
+            buttonEl.textContent = text + more;
+        }
+    }
+
+    function collectCheckedTexts(selector) {
+        const items = Array.from(document.querySelectorAll(selector));
+        return items.map(cb => {
+            const label = document.querySelector(`label[for="${cb.id}"]`);
+            return label ? label.textContent.trim() : cb.value;
+        });
+    }
+
+    updateSummary(document.getElementById('secProjectDropdownBtn'), collectCheckedTexts('.sec-project-option:checked'));
+
+    document.addEventListener('change', function(e){
+        if (e.target && e.target.classList.contains('sec-project-option')) {
+            updateSummary(document.getElementById('secProjectDropdownBtn'), collectCheckedTexts('.sec-project-option:checked'));
+        }
+    });
+
+    const formEl = document.getElementById('sectionSearchForm');
+    if (formEl) {
+        formEl.addEventListener('submit', function(e){
+            const url = new URL(window.location.href);
+            url.searchParams.delete('project');
+            document.querySelectorAll('.sec-project-option:checked').forEach(cb => {
+                url.searchParams.append('project', cb.value);
+            });
+            const startDate = document.getElementById('start_date');
+            const endDate = document.getElementById('end_date');
+            if (startDate && startDate.value) url.searchParams.set('start_date', startDate.value);
+            if (endDate && endDate.value) url.searchParams.set('end_date', endDate.value);
+            window.location.href = url.toString();
+            e.preventDefault();
+        });
+    }
+});
+</script>
 {% endblock %}

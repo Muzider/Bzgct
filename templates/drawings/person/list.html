@@ -39,24 +39,24 @@
                 <td>{{ person.position }}</td>
                 <td>{{ person.get_gender_display }}</td>
                                  <td>
-                     {% if person.is_active %}
-                         <span style="color: #27ae60; font-weight: bold;">在职</span>
-                     {% else %}
-                         <span style="color: #e74c3c; font-weight: bold;">离职</span>
-                     {% endif %}
-                 </td>
-                 <td>
-                     {% for person_role in person.personrole_set.all %}
-                         <span style="display: inline-block; background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px; margin: 1px;">{{ person_role.role.name }}</span>
-                     {% empty %}
-                         <span style="color: #95a5a6; font-style: italic;">未分配</span>
-                     {% endfor %}
-                 </td>
-                 <td>
-                     <a href="{% url 'drawings:person_roles' person.id %}" class="btn btn-primary btn-table">角色管理</a>
-                     <a href="{% url 'drawings:person_edit' person.id %}" class="btn btn-warning btn-table">编辑</a>
-                     <a href="{% url 'drawings:person_delete' person.id %}" class="btn btn-danger btn-table" onclick="return confirm('确定要删除这个人员吗？')">删除</a>
-                 </td>
+                    {% if person.is_active %}
+                        <span class="badge bg-success">在职</span>
+                    {% else %}
+                        <span class="badge bg-danger">离职</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% for person_role in person.personrole_set.all %}
+                        <span class="badge bg-primary me-1">{{ person_role.role.name }}</span>
+                    {% empty %}
+                        <span class="text-muted fst-italic">未分配</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'drawings:person_roles' person.id %}" class="btn btn-primary btn-sm">角色管理</a>
+                    <a href="{% url 'drawings:person_edit' person.id %}" class="btn btn-warning btn-sm">编辑</a>
+                    <a href="{% url 'drawings:person_delete' person.id %}" class="btn btn-danger btn-sm" onclick="return confirm('确定要删除这个人员吗？')">删除</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

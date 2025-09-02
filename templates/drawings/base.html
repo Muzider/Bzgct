@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}标准工程图系统{% endblock %}</title>
+    {% load static %}
+    <link href="{% static 'vendor/bootstrap-5.3.3/css/bootstrap.min.css' %}" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -74,7 +76,7 @@
             opacity: 1;
         }
         
-        .dropdown-menu {
+        .navbar .dropdown-menu {
             position: absolute;
             top: 100%;
             left: 0;
@@ -90,7 +92,7 @@
             z-index: 1000;
         }
         
-        .nav-item:hover .dropdown-menu {
+        .navbar .nav-item:hover .dropdown-menu {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
@@ -123,9 +125,10 @@
         }
         
         .main-content {
-            max-width: 1200px;
+            width: 100%;
+            max-width: none;
             margin: 20px auto;
-            padding: 0 20px;
+            padding: 0 24px;
         }
         
         .page-header {
@@ -154,66 +157,7 @@
             padding: 20px;
         }
         
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
         
-        .btn-primary {
-            background-color: #3498db;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn-success {
-            background-color: #27ae60;
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background-color: #229954;
-        }
-        
-        .btn-warning {
-            background-color: #f39c12;
-            color: white;
-        }
-        
-        .btn-warning:hover {
-            background-color: #e67e22;
-        }
-        
-        .btn-danger {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        
-        .btn-secondary {
-            background-color: #95a5a6;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #7f8c8d;
-        }
-        
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
         
         /* 统一按钮样式 */
         .btn-standard {
@@ -385,47 +329,7 @@
             align-items: center;
         }
         
-        /* Bootstrap栅格系统 */
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -15px;
-            margin-left: -15px;
-        }
-        
-        .col-md-2, .col-md-3, .col-md-4, .col-md-6 {
-            position: relative;
-            width: 100%;
-            padding-right: 15px;
-            padding-left: 15px;
-        }
-        
-        .col-md-2 {
-            flex: 0 0 16.666667%;
-            max-width: 16.666667%;
-        }
-        
-        .col-md-3 {
-            flex: 0 0 25%;
-            max-width: 25%;
-        }
-        
-        .col-md-4 {
-            flex: 0 0 33.333333%;
-            max-width: 33.333333%;
-        }
-        
-        .col-md-6 {
-            flex: 0 0 50%;
-            max-width: 50%;
-        }
-        
-        @media (max-width: 768px) {
-            .col-md-2, .col-md-3, .col-md-4, .col-md-6 {
-                flex: 0 0 100%;
-                max-width: 100%;
-            }
-        }
+        /* 取消自定义栅格，使用 Bootstrap 栅格系统 */
         
         /* 按钮间距 */
         .gap-1 {
@@ -436,46 +340,7 @@
             gap: 0.5rem;
         }
         
-        /* 按钮样式优化 */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-            cursor: pointer;
-        }
         
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .btn-outline-info {
-            color: #17a2b8;
-            border-color: #17a2b8;
-            background-color: transparent;
-        }
-        
-        .btn-outline-info:hover {
-            color: white;
-            background-color: #17a2b8;
-        }
-        
-        .btn-primary {
-            color: white;
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
         
         /* 图标样式 */
         .fas {
@@ -589,66 +454,61 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <a href="{% url 'drawings:index' %}" style="color: white; text-decoration: none;">
-                    标准工程图系统
-                </a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'drawings:index' %}">标准工程图系统</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'drawings:index' %}">首页</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="{% url 'drawings:permission_index' %}" id="navPermission" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            权限管理
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navPermission">
+                            <li><h6 class="dropdown-header">权限管理</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:person_list' %}">人员管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:role_list' %}">角色管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:permission_list' %}">权限管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navBasic" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            基础设置
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navBasic">
+                            <li><h6 class="dropdown-header">基础设置</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:ship_type_list' %}">船型管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:typical_section_list' %}">典型分段管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:work_type_list' %}">作业工种管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:work_process_list' %}">作业工序管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:standard_process_flow_list' %}">标准工艺流程管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navProject" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            项目管理
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navProject">
+                            <li><h6 class="dropdown-header">项目管理</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:project_list' %}">项目信息管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:section_list' %}">分段管理</a></li>
+                            <li><a class="dropdown-item" href="{% url 'drawings:pallet_list' %}">托盘管理</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
-            <nav class="nav">
-                <div class="nav-item">
-                    <a href="{% url 'drawings:index' %}" class="nav-link">首页</a>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="{% url 'drawings:permission_index' %}" class="nav-link">
-                        权限管理
-                        <span class="dropdown-arrow">▼</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-header">权限管理</div>
-                        <a href="{% url 'drawings:person_list' %}" class="dropdown-item">人员管理</a>
-                        <a href="{% url 'drawings:role_list' %}" class="dropdown-item">角色管理</a>
-                        <a href="{% url 'drawings:permission_list' %}" class="dropdown-item">权限管理</a>
-                    </div>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        基础设置
-                        <span class="dropdown-arrow">▼</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-header">基础设置</div>
-                        <a href="{% url 'drawings:ship_type_list' %}" class="dropdown-item">船型管理</a>
-                        <a href="{% url 'drawings:typical_section_list' %}" class="dropdown-item">典型分段管理</a>
-                        <a href="{% url 'drawings:work_type_list' %}" class="dropdown-item">作业工种管理</a>
-                        <a href="{% url 'drawings:work_process_list' %}" class="dropdown-item">作业工序管理</a>
-                        <a href="{% url 'drawings:standard_process_flow_list' %}" class="dropdown-item">标准工艺流程管理</a>
-                    </div>
-                </div>
-                
-                <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        项目管理
-                        <span class="dropdown-arrow">▼</span>
-                    </a>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-header">项目管理</div>
-                        <a href="{% url 'drawings:project_list' %}" class="dropdown-item">项目信息管理</a>
-                        <a href="{% url 'drawings:section_list' %}" class="dropdown-item">分段管理</a>
-                        <a href="{% url 'drawings:pallet_list' %}" class="dropdown-item">托盘管理</a>
-                    </div>
-                </div>
-            </nav>
         </div>
-    </header>
+    </nav>
     
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
-    
+    <script src="{% static 'vendor/bootstrap-5.3.3/js/bootstrap.bundle.min.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -11,35 +11,45 @@
 <div class="content-card">
     <!-- 搜索和筛选区域 -->
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e9ecef;">
-        <form method="get" class="row align-items-end">
+        <form method="get" class="row g-3 align-items-end" id="spfSearchForm">
             <div class="col-md-3">
                 <label for="search" class="form-label">搜索</label>
                 <input type="text" name="search" id="search" class="form-control" 
                        value="{{ search_query }}" placeholder="搜索工艺流程名称、船型或分段">
             </div>
             <div class="col-md-3">
-                <label for="ship_type" class="form-label">船型筛选</label>
-                <select name="ship_type" id="ship_type" class="form-control" multiple style="height: 60px;">
-                    {% for ship_type in ship_types %}
-                    <option value="{{ ship_type.id }}" {% if ship_type.id|stringformat:"s" in ship_type_filter %}selected{% endif %}>
-                        {{ ship_type.ship_type }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <small class="form-text text-muted">按住Ctrl键可多选</small>
+                <div class="form-label">船型筛选</div>
+                <div class="dropdown w-100">
+                    <button id="shipTypeDropdownBtn" class="btn btn-light w-100 text-start dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+                        <span class="text-muted">选择船型（可多选）</span>
+                    </button>
+                    <div class="dropdown-menu p-3 w-100" style="max-height: 260px; overflow: auto;">
+                        {% for ship_type in ship_types %}
+                        <div class="form-check">
+                            <input class="form-check-input ship-option" type="checkbox" id="ship_{{ ship_type.id }}" value="{{ ship_type.id }}" {% if ship_type.id|stringformat:"s" in ship_type_filter %}checked{% endif %}>
+                            <label class="form-check-label" for="ship_{{ ship_type.id }}">{{ ship_type.ship_type }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
             <div class="col-md-3">
-                <label for="typical_section" class="form-label">典型分段筛选</label>
-                <select name="typical_section" id="typical_section" class="form-control" multiple style="height: 60px;">
-                    {% for section in typical_sections %}
-                    <option value="{{ section.id }}" {% if section.id|stringformat:"s" in typical_section_filter %}selected{% endif %}>
-                        {{ section.section_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <small class="form-text text-muted">按住Ctrl键可多选</small>
+                <div class="form-label">典型分段筛选</div>
+                <div class="dropdown w-100">
+                    <button id="typicalSectionDropdownBtn" class="btn btn-light w-100 text-start dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-display="static" data-bs-auto-close="outside" aria-expanded="false">
+                        <span class="text-muted">选择分段（可多选）</span>
+                    </button>
+                    <div class="dropdown-menu p-3 w-100" style="max-height: 260px; overflow: auto;">
+                        {% for section in typical_sections %}
+                        <div class="form-check">
+                            <input class="form-check-input ts-option" type="checkbox" id="ts_{{ section.id }}" value="{{ section.id }}" {% if section.id|stringformat:"s" in typical_section_filter %}checked{% endif %}>
+                            <label class="form-check-label" for="ts_{{ section.id }}">{{ section.section_name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3 d-flex align-items-end gap-2">
+            <div class="col-12 col-md-auto d-flex align-items-end gap-2 flex-wrap">
                 <button type="submit" class="btn btn-primary btn-search">
                     <i class="fas fa-search"></i>搜索
                 </button>
@@ -132,4 +142,54 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function updateSummary(buttonEl, labels) {
+        if (!buttonEl) return;
+        const text = labels.slice(0, 2).join(', ');
+        const more = labels.length > 2 ? ` +${labels.length - 2}` : '';
+        if (labels.length === 0) {
+            buttonEl.innerHTML = '<span class="text-muted">未选择</span>';
+        } else {
+            buttonEl.textContent = text + more;
+        }
+    }
+
+    function collectCheckedTexts(selector) {
+        const items = Array.from(document.querySelectorAll(selector));
+        return items.map(cb => {
+            const label = document.querySelector(`label[for="${cb.id}"]`);
+            return label ? label.textContent.trim() : cb.value;
+        });
+    }
+
+    updateSummary(document.getElementById('shipTypeDropdownBtn'), collectCheckedTexts('.ship-option:checked'));
+    updateSummary(document.getElementById('typicalSectionDropdownBtn'), collectCheckedTexts('.ts-option:checked'));
+
+    document.addEventListener('change', function(e){
+        if (e.target && e.target.classList.contains('ship-option')) {
+            updateSummary(document.getElementById('shipTypeDropdownBtn'), collectCheckedTexts('.ship-option:checked'));
+        }
+        if (e.target && e.target.classList.contains('ts-option')) {
+            updateSummary(document.getElementById('typicalSectionDropdownBtn'), collectCheckedTexts('.ts-option:checked'));
+        }
+    });
+
+    const formEl = document.getElementById('spfSearchForm');
+    if (formEl) {
+        formEl.addEventListener('submit', function(e){
+            const url = new URL(window.location.href);
+            url.searchParams.delete('ship_type');
+            document.querySelectorAll('.ship-option:checked').forEach(cb => url.searchParams.append('ship_type', cb.value));
+            url.searchParams.delete('typical_section');
+            document.querySelectorAll('.ts-option:checked').forEach(cb => url.searchParams.append('typical_section', cb.value));
+            const searchEl = document.getElementById('search');
+            if (searchEl && searchEl.value.trim()) url.searchParams.set('search', searchEl.value.trim());
+            window.location.href = url.toString();
+            e.preventDefault();
+        });
+    }
+});
+</script>
 {% endblock %}

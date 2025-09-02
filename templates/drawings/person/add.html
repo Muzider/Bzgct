@@ -15,79 +15,85 @@
     </div>
     {% endif %}
     
-    <form method="post">
+    <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
         
-        <div class="form-group">
+        <div class="mb-3">
             <label for="name" class="form-label">姓名 *</label>
             <input type="text" id="name" name="name" class="form-control" required>
+            <div class="invalid-feedback">请输入姓名</div>
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label for="employee_id" class="form-label">工号 *</label>
             <input type="text" id="employee_id" name="employee_id" class="form-control" required>
+            <div class="invalid-feedback">请输入工号</div>
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label for="department" class="form-label">部门 *</label>
             <input type="text" id="department" name="department" class="form-control" required>
+            <div class="invalid-feedback">请输入部门</div>
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label for="position" class="form-label">职位 *</label>
             <input type="text" id="position" name="position" class="form-control" required>
+            <div class="invalid-feedback">请输入职位</div>
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label class="form-label">性别 *</label>
-            <div>
-                <label for="gender_male" style="margin-right: 20px;">
-                    <input type="radio" id="gender_male" name="gender" value="M" checked> 男 
-                </label>
-                <label for="gender_female">
-                    <input type="radio" id="gender_female" name="gender" value="F"> 女
-                </label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="gender_male" name="gender" value="M" checked>
+                <label class="form-check-label" for="gender_male">男</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="gender_female" name="gender" value="F">
+                <label class="form-check-label" for="gender_female">女</label>
             </div>
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label for="phone" class="form-label">电话</label>
             <input type="tel" id="phone" name="phone" class="form-control">
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label for="email" class="form-label">邮箱</label>
             <input type="email" id="email" name="email" class="form-control">
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label class="form-label">状态</label>
-            <div>
-                <label for="is_active_1" style="margin-right: 20px;">
-                    <input type="radio" id="is_active_1" name="is_active" value="1" checked> 在职
-                </label>
-                <label for="is_active_0">
-                    <input type="radio" id="is_active_0" name="is_active" value="0"> 离职
-                </label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="is_active_1" name="is_active" value="1" checked>
+                <label class="form-check-label" for="is_active_1">在职</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" id="is_active_0" name="is_active" value="0">
+                <label class="form-check-label" for="is_active_0">离职</label>
             </div>
         </div>
         
-        <div class="form-group">
+        <div class="mb-3">
             <label class="form-label">分配角色</label>
-            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #dee2e6;">
+            <div class="p-3 border rounded bg-light">
                 {% if roles %}
-                    <p style="color: #666; margin-bottom: 10px; font-size: 14px;">请选择要分配给该人员的角色（可多选）：</p>
+                    <p class="text-muted mb-2" style="font-size: 14px;">请选择要分配给该人员的角色（可多选）：</p>
                     {% for role in roles %}
-                    <label for="role_{{ role.id }}" style="display: block; margin-bottom: 8px; cursor: pointer;">
-                        <input type="checkbox" id="role_{{ role.id }}" name="roles" value="{{ role.id }}" style="margin-right: 8px;">
-                        <strong>{{ role.name }}</strong>
-                        {% if role.description %}
-                            <span style="color: #666; font-size: 13px;"> - {{ role.description }}</span>
-                        {% endif %}
-                    </label>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="role_{{ role.id }}" name="roles" value="{{ role.id }}">
+                        <label class="form-check-label" for="role_{{ role.id }}">
+                            <strong>{{ role.name }}</strong>
+                            {% if role.description %}
+                                <span class="text-muted" style="font-size: 13px;"> - {{ role.description }}</span>
+                            {% endif %}
+                        </label>
+                    </div>
                     {% endfor %}
                 {% else %}
-                    <p style="color: #e74c3c; font-size: 14px;">⚠️ 暂无可用的角色，请先创建角色后再添加人员。</p>
+                    <p class="text-danger" style="font-size: 14px;">⚠️ 暂无可用的角色，请先创建角色后再添加人员。</p>
                     <a href="{% url 'drawings:role_add' %}" class="btn btn-primary btn-sm">创建角色</a>
                 {% endif %}
             </div>
